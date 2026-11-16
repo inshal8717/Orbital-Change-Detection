@@ -38,11 +38,16 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--data", default=str(ROOT / "data" / "benchmark"))
     p.add_argument("--runs", default=str(ROOT / "outputs" / "v2" / "runs"))
+    p.add_argument("--resume", action="store_true",
+                   help="continue an interrupted run; skip a finished one. The result is identical to an uninterrupted run")
     args = p.parse_args(argv)
 
     config = json.loads(Path(args.config).read_text())
     out = run_dir(config, args.seed, Path(args.runs))
-    train.main(train_args(config, args.seed, Path(args.data), out))
+    if args.resume and (out / "run.json").exists():
+        print(f"{out} is already finished")
+        return
+    train.main(train_args(config, args.seed, Path(args.data), out) + (["--resume"] if args.resume else []))
     commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     (out / "run.json").write_text(json.dumps({"config": config, "seed": args.seed, "commit": commit}, indent=2) + "\n")
 

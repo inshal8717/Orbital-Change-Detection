@@ -78,3 +78,22 @@ def test_training_with_the_pair_loss_runs_and_logs_it(tmp_path: Path):
     history = json.loads((out / "history.json").read_text())
     assert np.isfinite(history[0]["loss"]) and np.isfinite(history[0]["pair_loss"])
     assert (out / "best.pt").exists()
+
+
+def test_resumed_training_matches_an_uninterrupted_run(tmp_path: Path):
+    write_pair(tmp_path / "data", "alpha")
+    write_pair(tmp_path / "data", "beta")
+    common = ["--data", str(tmp_path / "data"), "--epochs", "3", "--samples-per-epoch", "8", "--batch-size", "4",
+              "--patch-size", "16", "--width", "8", "--projection-dim", "16", "--pair-weight", "1.0", "--pair-points", "4",
+              "--seed", "7", "--device", "cpu"]
+    train.main(common + ["--output", str(tmp_path / "full")])
+    train.main(common + ["--output", str(tmp_path / "split"), "--stop-after", "1"])
+    assert not (tmp_path / "split" / "history.json").exists()  # stopped early
+    train.main(common + ["--output", str(tmp_path / "split"), "--resume"])
+
+    assert json.loads((tmp_path / "full" / "history.json").read_text()) == json.loads((tmp_path / "split" / "history.json").read_text())
+    for name in ("best.pt", "last.pt"):
+        full = torch.load(tmp_path / "full" / name, weights_only=False)["model"]
+        split = torch.load(tmp_path / "split" / name, weights_only=False)["model"]
+        assert full.keys() == split.keys()
+        assert all(torch.equal(full[key], split[key]) for key in full)

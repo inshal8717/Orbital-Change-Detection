@@ -40,6 +40,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="weight of the dense temporal loss on co-located before/after patches (0 = off, the v1 objective)")
     p.add_argument("--pair-points", type=int, default=16, help="positions sampled per patch and feature stage")
     p.add_argument("--workers", type=int, default=0)
+    p.add_argument("--resume", action="store_true",
+                   help="continue from <output>/last.pt if it exists; the result is identical to an uninterrupted run")
+    p.add_argument("--stop-after", type=int, help="stop after this epoch (to be continued later with --resume)")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--device", default=default_device())
     return p.parse_args(argv)
@@ -77,7 +80,21 @@ def main(argv: list[str] | None = None) -> None:
     config = vars(args)
     best_loss = float("inf")
     history: list[dict[str, float]] = []
-    for epoch in range(1, args.epochs + 1):
+    start_epoch = 1
+    if args.resume and (out / "last.pt").exists():
+        saved = torch.load(out / "last.pt", map_location=args.device, weights_only=False)
+        if "rng" not in saved:
+            raise SystemExit(f"{out / 'last.pt'} was written without resume information; delete it and start again")
+        model.load_state_dict(saved["model"])
+        optimizer.load_state_dict(saved["optimizer"])
+        scheduler.load_state_dict(saved["scheduler"])
+        history, best_loss, start_epoch = saved["history"], saved["best_loss"], saved["epoch"] + 1
+        # Restoring every random stream makes the remaining epochs draw the same patches and augmentations.
+        random.setstate(saved["rng"]["python"])
+        np.random.set_state(saved["rng"]["numpy"])
+        torch.set_rng_state(saved["rng"]["torch"])
+        log.info("resuming after epoch %d", saved["epoch"])
+    for epoch in range(start_epoch, args.epochs + 1):
         model.train()
         total = 0.0
         total_pair = 0.0
@@ -108,11 +125,22 @@ def main(argv: list[str] | None = None) -> None:
             "loss": avg,
             "config": config,
         }
-        torch.save(state, out / "last.pt")
         if avg < best_loss:
             best_loss = avg
             torch.save(state, out / "best.pt")
+        resume_state = {
+            **state,
+            "scheduler": scheduler.state_dict(),
+            "history": history,
+            "best_loss": best_loss,
+            "rng": {"python": random.getstate(), "numpy": np.random.get_state(), "torch": torch.get_rng_state()},
+        }
+        torch.save(resume_state, out / "last.tmp")
+        (out / "last.tmp").replace(out / "last.pt")  # atomic: a kill mid-write cannot leave a broken last.pt
         log.info("epoch=%03d loss=%.5f", epoch, avg)
+        if args.stop_after is not None and epoch >= args.stop_after and epoch < args.epochs:
+            log.info("stopping after epoch %d as requested; continue with --resume", epoch)
+            return
 
     (out / "history.json").write_text(json.dumps(history, indent=2))
     log.info("wrote checkpoints and history to %s", out)
