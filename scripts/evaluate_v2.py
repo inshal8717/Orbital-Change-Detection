@@ -70,7 +70,7 @@ def build_scorers(config: dict, seeds: list[int], runs: Path, methods: list[str]
     if "trained" in methods:
         scorers["trained"] = {}
         for seed in seeds:
-            checkpoint = runs / config["name"] / f"seed{seed}" / "best.pt"
+            checkpoint = runs / config.get("checkpoint_from", config["name"]) / f"seed{seed}" / "best.pt"
             if not checkpoint.exists():
                 raise SystemExit(f"missing {checkpoint}; run scripts/train_v2.py --config ... --seed {seed} first")
             scorers["trained"][f"seed{seed}"] = network(load_model(checkpoint))

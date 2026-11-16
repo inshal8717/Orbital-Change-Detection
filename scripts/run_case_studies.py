@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> None:
     }
     post = make_postprocess(config.get("post"))
     score_cfg = config.get("score", {})
-    checkpoint = Path(args.runs) / config["name"] / seed / "best.pt"
+    checkpoint = Path(args.runs) / config.get("checkpoint_from", config["name"]) / seed / "best.pt"
     figures = Path(args.figures)
     figures.mkdir(parents=True, exist_ok=True)
 

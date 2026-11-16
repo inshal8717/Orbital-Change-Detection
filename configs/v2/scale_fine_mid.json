@@ -1,0 +1,21 @@
+{
+  "name": "scale_fine_mid",
+  "description": "baseline checkpoints, scored with the fine and middle feature scales only (coarse scale dropped).",
+  "checkpoint_from": "baseline",
+  "train": {
+    "epochs": 10,
+    "samples_per_epoch": 2048,
+    "batch_size": 64,
+    "patch_size": 64,
+    "width": 32,
+    "projection_dim": 128,
+    "temperature": 0.2,
+    "lr": 0.0003
+  },
+  "score": {
+    "stretch": "shared",
+    "tile_size": 512,
+    "overlap": 32,
+    "scale_weights": [1, 1, 0]
+  }
+}

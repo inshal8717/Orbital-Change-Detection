@@ -1,1 +1,82 @@
-{"experiments": []}
+{
+  "experiments": [
+    {
+      "id": "ref-a",
+      "change": "Reference: colour difference, shared stretch (no network)",
+      "kind": "reference",
+      "seeds": "none",
+      "primary": "0.224",
+      "delta": "\u2013",
+      "ap": "0.141",
+      "decision": "to beat",
+      "primary_mean": 0.22440177341532996,
+      "primary_std": 0.0,
+      "config": "baseline"
+    },
+    {
+      "id": "ref-b",
+      "change": "Reference: colour difference, raw values (no network)",
+      "kind": "reference",
+      "seeds": "none",
+      "primary": "0.268",
+      "delta": "\u2013",
+      "ap": "0.181",
+      "decision": "reference",
+      "primary_mean": 0.267779194190134,
+      "primary_std": 0.0,
+      "config": "baseline"
+    },
+    {
+      "id": "ref-c",
+      "change": "Reference: v1 network with random weights",
+      "kind": "reference",
+      "seeds": "42, 43, 44",
+      "primary": "0.092 \u00b1 0.005",
+      "delta": "\u2013",
+      "ap": "0.045 \u00b1 0.001",
+      "decision": "reference",
+      "primary_mean": 0.0915063202509145,
+      "primary_std": 0.004948787725907537,
+      "config": "baseline"
+    },
+    {
+      "id": "0",
+      "change": "v1 as it was: per-scene Otsu threshold",
+      "kind": "start",
+      "seeds": "42, 43, 44",
+      "primary": "0.083 \u00b1 0.002",
+      "delta": "\u2013",
+      "ap": "0.115 \u00b1 0.008",
+      "decision": "start",
+      "primary_mean": 0.08263317110523044,
+      "primary_std": 0.002184531180253546,
+      "config": "baseline"
+    },
+    {
+      "id": "1",
+      "change": "Threshold fitted on validation scenes instead of Otsu",
+      "kind": "threshold",
+      "seeds": "42, 43, 44",
+      "primary": "0.145 \u00b1 0.014",
+      "delta": "+0.063",
+      "ap": "0.115 \u00b1 0.008",
+      "decision": "kept",
+      "primary_mean": 0.14516573100880073,
+      "primary_std": 0.014077068926180703,
+      "config": "baseline"
+    },
+    {
+      "id": "2",
+      "change": "Drop the coarsest feature scale from the score",
+      "kind": "model (scoring)",
+      "seeds": "42, 43, 44",
+      "primary": "0.202 \u00b1 0.004",
+      "delta": "+0.057",
+      "ap": "0.137 \u00b1 0.008",
+      "decision": "kept",
+      "primary_mean": 0.20207478715599805,
+      "primary_std": 0.0036966039504073003,
+      "config": "scale_fine_mid"
+    }
+  ]
+}

@@ -77,7 +77,7 @@ def panels(args: argparse.Namespace) -> None:
         "diff_shared": results["val"]["methods"]["diff_shared"]["-"]["threshold"],
     }
     post = make_postprocess(config.get("post"))
-    model = load_model(Path(args.runs) / config["name"] / seed / "best.pt")
+    model = load_model(Path(args.runs) / config.get("checkpoint_from", config["name"]) / seed / "best.pt")
     out_dir = Path(args.output)
     out_dir.mkdir(parents=True, exist_ok=True)
     summary = []

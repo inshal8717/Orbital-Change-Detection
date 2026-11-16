@@ -1,0 +1,26 @@
+{
+  "name": "pair_dense_t01",
+  "description": "pair_dense_fine_mid with contrastive temperature 0.1 instead of 0.2 (both loss terms).",
+  "train": {
+    "epochs": 10,
+    "samples_per_epoch": 2048,
+    "batch_size": 64,
+    "patch_size": 64,
+    "width": 32,
+    "projection_dim": 128,
+    "temperature": 0.1,
+    "lr": 0.0003,
+    "pair_weight": 1.0,
+    "pair_points": 16
+  },
+  "score": {
+    "stretch": "shared",
+    "tile_size": 512,
+    "overlap": 32,
+    "scale_weights": [
+      1,
+      1,
+      0
+    ]
+  }
+}
