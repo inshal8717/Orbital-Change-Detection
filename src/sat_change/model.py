@@ -75,3 +75,31 @@ def feature_change(
     else:
         raise ValueError(f"fusion must be 'mean' or 'geomean', not {fusion!r}")
     return fused.squeeze(1)
+
+
+def dense_temporal_loss(
+    feats_before: list[torch.Tensor],
+    feats_after: list[torch.Tensor],
+    points: int = 16,
+    temperature: float = 0.2,
+) -> torch.Tensor:
+    """Pixel-level contrastive loss between co-located patches from two dates.
+
+    At ``points`` random positions per patch and per feature stage, the feature
+    of the "before" patch is pulled towards the feature at the SAME position in
+    the "after" patch and pushed away from the features at all other sampled
+    positions in the batch. No label is used: the loss assumes only that most
+    ground does not change between two dates.
+    """
+    total = feats_before[0].new_zeros(())
+    for fb, fa in zip(feats_before, feats_after):
+        b, c, h, w = fb.shape
+        n = min(points, h * w)
+        index = torch.stack([torch.randperm(h * w, device=fb.device)[:n] for _ in range(b)])
+        gather = index[:, None, :].expand(-1, c, -1)
+        zb = F.normalize(fb.flatten(2).gather(2, gather).permute(0, 2, 1).reshape(-1, c), dim=1)
+        za = F.normalize(fa.flatten(2).gather(2, gather).permute(0, 2, 1).reshape(-1, c), dim=1)
+        logits = zb @ za.T / temperature
+        targets = torch.arange(logits.shape[0], device=logits.device)
+        total = total + 0.5 * (F.cross_entropy(logits, targets) + F.cross_entropy(logits.T, targets))
+    return total / len(feats_before)

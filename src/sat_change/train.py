@@ -16,8 +16,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from .data import ContrastivePatchDataset
-from .model import SatelliteEncoder, nt_xent
+from .data import ContrastivePatchDataset, TemporalPairDataset
+from .model import SatelliteEncoder, dense_temporal_loss, nt_xent
 from .runtime import default_device
 
 log = logging.getLogger("sat_change.train")
@@ -36,6 +36,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--projection-dim", type=int, default=128)
     p.add_argument("--temperature", type=float, default=0.2)
     p.add_argument("--lr", type=float, default=3e-4)
+    p.add_argument("--pair-weight", type=float, default=0.0,
+                   help="weight of the dense temporal loss on co-located before/after patches (0 = off, the v1 objective)")
+    p.add_argument("--pair-points", type=int, default=16, help="positions sampled per patch and feature stage")
     p.add_argument("--workers", type=int, default=0)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--device", default=default_device())
@@ -63,6 +66,10 @@ def main(argv: list[str] | None = None) -> None:
         drop_last=True,
         pin_memory=args.device.startswith("cuda"),
     )
+    pair_loader = None
+    if args.pair_weight > 0:
+        pairs = TemporalPairDataset(args.data, args.patch_size, args.samples_per_epoch, args.bands)
+        pair_loader = DataLoader(pairs, batch_size=args.batch_size, shuffle=True, num_workers=args.workers, drop_last=True)
     model = SatelliteEncoder(args.bands, args.width, args.projection_dim).to(args.device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, args.epochs)
@@ -73,10 +80,18 @@ def main(argv: list[str] | None = None) -> None:
     for epoch in range(1, args.epochs + 1):
         model.train()
         total = 0.0
+        total_pair = 0.0
+        pair_batches = iter(pair_loader) if pair_loader is not None else None
         for x1, x2 in loader:
             x1, x2 = x1.to(args.device), x2.to(args.device)
             optimizer.zero_grad(set_to_none=True)
             loss = nt_xent(model(x1), model(x2), args.temperature)
+            if pair_batches is not None:
+                before, after = next(pair_batches)
+                pair_loss = dense_temporal_loss(model.features(before.to(args.device)), model.features(after.to(args.device)),
+                                                args.pair_points, args.temperature)
+                loss = loss + args.pair_weight * pair_loss
+                total_pair += pair_loss.item()
             loss.backward()
             optimizer.step()
             total += loss.item()
@@ -84,6 +99,8 @@ def main(argv: list[str] | None = None) -> None:
 
         avg = total / len(loader)
         history.append({"epoch": epoch, "loss": avg})
+        if pair_loader is not None:
+            history[-1]["pair_loss"] = total_pair / len(loader)
         state = {
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
