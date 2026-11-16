@@ -33,11 +33,12 @@ def _write(path: Path, arr: np.ndarray, nodata, dtype="float32") -> None:
         dst.write(arr, 1)
 
 
-def _item(tmp: Path, name: str, *, cloud: bool = False, nodata: bool = False):
+def _item(tmp: Path, name: str, *, cloud: bool = False, nodata: bool = False, baseline: str | None = None,
+          value: float = CLEAR):
     """Fake STAC item. Pixel (0, 0) is cloud (bright, SCL=8) or nodata (0) when requested."""
     assets = {}
     for band in fetch.BANDS:
-        arr = np.full((H, W), CLEAR, np.float32)
+        arr = np.full((H, W), value, np.float32)
         if cloud:
             arr[0, 0] = BRIGHT_CLOUD
         if nodata:
@@ -51,7 +52,8 @@ def _item(tmp: Path, name: str, *, cloud: bool = False, nodata: bool = False):
     scl_path = tmp / f"{name}_SCL.tif"
     _write(scl_path, scl, nodata=0, dtype="uint8")
     assets["SCL"] = SimpleNamespace(href=str(scl_path))
-    return SimpleNamespace(id=name, assets=assets)
+    properties = {} if baseline is None else {"s2:processing_baseline": baseline}
+    return SimpleNamespace(id=name, assets=assets, properties=properties)
 
 
 def _identity(item):
@@ -83,3 +85,30 @@ def test_write_tiff_stores_nodata_as_zero(tmp_path: Path):
     assert np.isfinite(data).all()
     assert data[0, 0] == 0
     assert data[1, 1] == 500
+
+
+def test_boa_offset_follows_the_processing_baseline():
+    def item(baseline):
+        return SimpleNamespace(properties={"s2:processing_baseline": baseline})
+
+    assert fetch._boa_offset(item("02.12")) == 0
+    assert fetch._boa_offset(item("03.00")) == 0
+    assert fetch._boa_offset(item("04.00")) == 1000
+    assert fetch._boa_offset(item("05.10")) == 1000
+    assert fetch._boa_offset(SimpleNamespace(properties={})) == 0
+    assert fetch._boa_offset(SimpleNamespace()) == 0
+
+
+def test_composites_before_and_after_2022_share_one_scale(tmp_path: Path):
+    """The same ground must give the same value whichever processing baseline delivered it."""
+    old = fetch._composite([_item(tmp_path, "old", baseline="02.12")], CRS, TRANSFORM, H, W, use_scl=True, sign=_identity)
+    new = fetch._composite([_item(tmp_path, "new", baseline="05.10", value=CLEAR + 1000)], CRS, TRANSFORM, H, W,
+                           use_scl=True, sign=_identity)
+    assert np.allclose(old, CLEAR) and np.allclose(new, CLEAR)
+
+
+def test_offset_removal_keeps_nodata_and_never_writes_zero_for_valid_pixels(tmp_path: Path):
+    item = _item(tmp_path, "dark", baseline="04.00", value=900.0, nodata=True)  # darker than the offset
+    comp = fetch._composite([item], CRS, TRANSFORM, H, W, use_scl=False, sign=_identity)
+    assert np.isnan(comp[:, 0, 0]).all()
+    assert np.allclose(comp[:, 4, 4], 1.0)

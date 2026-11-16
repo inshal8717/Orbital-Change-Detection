@@ -52,12 +52,27 @@ COLLECTION = "sentinel-2-l2a"
 BANDS = ["B02", "B03", "B04", "B08"]
 # SCL classes that are no-data, clouds, cirrus or shadow: excluded from composites.
 BAD_SCL = {0, 3, 7, 8, 9, 10}
+# From processing baseline 04.00 (in use from 25 January 2022) Sentinel-2 stores reflectance x 10000 PLUS 1000.
+# Planetary Computer serves the values as delivered, so a pair that straddles that date would differ by a
+# constant 1000 in every band. The offset is removed here so that both dates share one scale.
+BOA_OFFSET_BASELINE = 4.0
+BOA_OFFSET = 1000.0
 
 
 def _utm_epsg(lon: float, lat: float) -> int:
     """EPSG code for the UTM zone containing (lon, lat), northern/southern."""
     zone = int((lon + 180) // 6) + 1
     return 32600 + zone if lat >= 0 else 32700 + zone
+
+
+def _boa_offset(item) -> float:
+    """Digital-number offset to subtract from one acquisition, from its processing baseline."""
+    properties = getattr(item, "properties", None) or {}
+    try:
+        baseline = float(properties.get("s2:processing_baseline", 0))
+    except (TypeError, ValueError):
+        return 0.0
+    return BOA_OFFSET if baseline >= BOA_OFFSET_BASELINE else 0.0
 
 
 def _bbox(center: tuple[float, float], size_km: float) -> tuple[float, float, float, float]:
@@ -140,6 +155,10 @@ def _composite(
             _reproject(item.assets[b].href, dst_crs, transform, height, width, rasterio.enums.Resampling.bilinear)
             for b in BANDS
         ])
+        offset = _boa_offset(item)
+        if offset:
+            # Keep valid pixels above 0, which is the nodata value on disk. NaN (nodata) stays NaN.
+            bands = np.maximum(bands - offset, 1.0)
         if use_scl and "SCL" in item.assets:
             scl = _reproject(item.assets["SCL"].href, dst_crs, transform, height, width, rasterio.enums.Resampling.nearest)
             # SCL holds small integer classes; NaN (no data) maps to class 0, which is in BAD_SCL.
@@ -199,12 +218,18 @@ def main() -> None:
     masks_dir = scene_dir / "masks"
 
     rows = []
+    acquisitions: dict[str, list[dict]] = {}
     for label, window in (("before", a.before), ("after", a.after)):
         items = _search(catalog, bbox, window, a.cloud_max)
         if not items:
             raise SystemExit(f"no cloud-free (<{a.cloud_max}%) Sentinel-2 items in {window} window")
         items = sorted(items, key=lambda it: it.properties.get("eo:cloud_cover", 999))[: a.limit]
         print(f"{label}: {len(items)} item(s): " + ", ".join(it.id for it in items))
+        acquisitions[label] = [
+            {"id": it.id, "date": it.datetime.date().isoformat(), "cloud_cover": it.properties.get("eo:cloud_cover"),
+             "processing_baseline": it.properties.get("s2:processing_baseline"), "boa_offset_removed": _boa_offset(it)}
+            for it in items
+        ]
         arr = _composite(items, dst_crs, transform, height, width, use_scl=not a.no_scl)
         date = datetime.fromisoformat(items[0].datetime.isoformat()).date()
         filename = f"{a.scene}_{date.isoformat()}.tif"
@@ -242,7 +267,9 @@ def main() -> None:
         "bands": BANDS,
         "grid": {"crs": f"EPSG:{dst_crs}", "transform": list(transform)[:6], "height": height, "width": width},
         "cloud_max": a.cloud_max,
+        "limit": a.limit,
         "scl_masked": not a.no_scl,
+        "acquisitions": acquisitions,
     }
     with open(scene_dir / "metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
