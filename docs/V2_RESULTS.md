@@ -312,3 +312,20 @@ The improved network (section 6) is reproduced the same way with `configs/v2/pai
 per seed) and `--output docs/data/v2_results_final.json` on the test pass. `bash scripts/run_queue_v2.sh
 pair_dense_t01:42 pair_dense_t01:43 pair_dense_t01:44` trains the three seeds and can be re-run after an interruption:
 a resumed run gives the same weights as an uninterrupted one.
+
+## Checks run before this was written up (Step C2)
+
+On a fresh clone of the `v2` branch, with only the three OSCD archives copied in:
+
+- `pytest` passed (73 tests) and `ruff check .` was clean.
+- `python scripts/reproduce_results.py` ran. The synthetic results match the committed ones to seven decimal
+  places; the README's synthetic table is unchanged.
+- `python scripts/fetch_benchmark.py` rebuilt the benchmark folders and left the split file unchanged.
+- Retraining `configs/v2/baseline.json` with seed 42 gave the same final loss (1.21916), and
+  `scripts/evaluate_v2.py` gave validation scores identical to the committed ones for all four methods. Training is
+  deterministic on this machine. A different CPU or PyTorch version may differ in the last digits.
+- `python scripts/render_v2_tables.py --check` passed, and no tracked file is over 5 MB.
+
+Not re-run on the fresh clone: the two pair-trained configurations (15 minutes per seed) and the test passes, which
+are limited to one per configuration.
+
