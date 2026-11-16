@@ -18,6 +18,8 @@ fetch = ["rasterio>=1.3", "pystac-client>=0.8", "planetary-computer>=1.0"]
 test = ["pytest>=7"]
 lint = ["ruff>=0.5"]
 dashboard = ["streamlit>=1.38", "plotly>=5.22"]
+# Result figures for the v2 real-data evaluation (scripts/make_v2_figures.py, scripts/run_case_studies.py).
+figures = ["matplotlib>=3.7"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -32,6 +32,8 @@ known while the loop ran. No test score was computed for any candidate below, an
 ## Summary
 
 <!-- v2:experiments file=v2_experiments/index.json -->
+| # | Single change | Kind | Seeds | Validation F1 (leave one scene out) | Change vs best so far | Validation PR-AUC | Decision |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 <!-- /v2 -->
 
 ## Entries
@@ -65,10 +67,13 @@ known while the loop ran. No test score was computed for any candidate below, an
 - **Section.** E (pretraining on pairs). Needs retraining.
 - **Hypothesis (written before the run).** The v1 objective only ever sees one image at a time, so nothing teaches
   the features to ignore what differs between two dates for reasons other than change: season, sun angle, haze,
-  crops. The failure panels show exactly that, with fields and bright soil marked as change. Adding a pixel-level
+  crops. The validation failure panels show exactly that: in `bercy` (late November against late August) the
+  network marks most of the city, and in `paris` it marks clouds and a cloud shadow as large blobs. Adding a pixel-level
   contrastive loss between co-located patches of the two dates (same position is the positive, other positions are
   negatives) trains the very features that are compared at scoring time to agree where the ground is the same. It uses
   no mask; it only assumes most ground does not change. I expect PR-AUC and the primary metric to rise clearly. I
   would discard it if the seed-42 primary metric is not above the baseline's three-seed mean by more than 0.028.
+- **Note.** The sentence about the failure panels was corrected about ten minutes after this entry was first
+  committed, once the panels had been rendered and looked at. The run had not finished and no result was known.
 - **Config.** `configs/v2/pair_dense.json`: baseline plus `pair_weight 1.0`, `pair_points 16`. One change: the added
   loss term. The single-image loss is kept as it was.

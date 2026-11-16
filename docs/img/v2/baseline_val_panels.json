@@ -1,0 +1,40 @@
+{
+  "config": "baseline",
+  "seed": 42,
+  "thresholds": {
+    "trained": 0.5655556917190552,
+    "diff_shared": 0.8069392442703247
+  },
+  "scenes": [
+    {
+      "scene": "abudhabi",
+      "changed_fraction": 0.03761389635133088,
+      "f1_trained": 0.147117540465002,
+      "f1_diff_shared": 0.16612763272067524
+    },
+    {
+      "scene": "aguasclaras",
+      "changed_fraction": 0.016402790415529268,
+      "f1_trained": 0.11578774975433999,
+      "f1_diff_shared": 0.1028047127515379
+    },
+    {
+      "scene": "beirut",
+      "changed_fraction": 0.026863614763187074,
+      "f1_trained": 0.44626228327416784,
+      "f1_diff_shared": 0.36363636363636365
+    },
+    {
+      "scene": "bercy",
+      "changed_fraction": 0.007355836849507736,
+      "f1_trained": 0.008849341784495368,
+      "f1_diff_shared": 0.05024406117800195
+    },
+    {
+      "scene": "paris",
+      "changed_fraction": 0.0028783308195072903,
+      "f1_trained": 0.024155466763530694,
+      "f1_diff_shared": 0.10003718854592786
+    }
+  ]
+}
