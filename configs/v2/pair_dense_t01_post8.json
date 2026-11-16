@@ -1,0 +1,30 @@
+{
+  "name": "pair_dense_t01_post8",
+  "description": "pair_dense_t01 checkpoints; marked groups smaller than 8 pixels are removed from every method's mask.",
+  "train": {
+    "epochs": 10,
+    "samples_per_epoch": 2048,
+    "batch_size": 64,
+    "patch_size": 64,
+    "width": 32,
+    "projection_dim": 128,
+    "temperature": 0.1,
+    "lr": 0.0003,
+    "pair_weight": 1.0,
+    "pair_points": 16
+  },
+  "score": {
+    "stretch": "shared",
+    "tile_size": 512,
+    "overlap": 32,
+    "scale_weights": [
+      1,
+      1,
+      0
+    ]
+  },
+  "checkpoint_from": "pair_dense_t01",
+  "post": {
+    "min_size": 8
+  }
+}
