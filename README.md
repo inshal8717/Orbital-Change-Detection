@@ -163,6 +163,15 @@ python scripts/fetch_sentinel2.py \
 
 Without a mask you can still inspect the score maps, but IoU, F1 and AUROC are not computed.
 
+Two things to know when fetching, both found on the UAE case studies:
+
+- **Pairs that straddle January 2022.** Sentinel-2 images processed with baseline 04.00 or later store every value
+  1000 higher. The script removes that offset, so both dates share one scale. Before this fix such a pair looked
+  changed everywhere.
+- **Bright ground and the cloud mask.** `--limit` composites exclude pixels that Sentinel-2's scene classification
+  calls cloud or shadow. Over pale sand, bright roofs and mirror fields it is often wrong (31% of one Dubai image was
+  discarded). Pass `--no-scl` for such scenes and rely on `--cloud-max` and the median instead.
+
 To export the same inputs from Google Earth Engine instead, filter `COPERNICUS/S2_SR_HARMONIZED` by area, date and
 cloud cover, mask clouds, make one composite per window, reproject both to the same grid, and name the files with the
 scene key and window date.

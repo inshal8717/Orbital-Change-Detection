@@ -340,6 +340,7 @@ changed: cleared forest, new buildings, flooding. It learns what satellite image
   <a href="{REPO_URL}">Source code</a>
   <a href="{REPO_URL}#quick-start">Quick start</a>
   <a href="#glossary">Glossary</a>
+  <a href="case-studies.html">Real satellite case studies (UAE)</a>
 </p>
 
 <h2>What it does, in one picture</h2>

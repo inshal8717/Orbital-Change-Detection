@@ -68,6 +68,20 @@ def test_main(data: dict, **_) -> str:
     return metric_table(data["test"]["headline"], "val_threshold", "pooled")
 
 
+def test_combined(data: dict, base: str, **_) -> str:
+    """The v1 network (from the ``base`` result file) beside the improved one and the references."""
+    rows = []
+    sources = [("v1 network, as it was (Part A)", load(base)["test"]["headline"]["trained"]),
+               ("Improved network (after the loop)", data["test"]["headline"]["trained"]),
+               ("Improved scoring, untrained network", data["test"]["headline"]["untrained"]),
+               (LABELS["diff_shared"], data["test"]["headline"]["diff_shared"]),
+               (LABELS["diff_raw"], data["test"]["headline"]["diff_raw"])]
+    for label, h in sources:
+        rows.append([label, cell(h["auroc_pooled"]), cell(h["ap_pooled"])]
+                    + [cell(h[f"val_threshold_pooled_{m}"]) for m in ("f1", "iou", "precision", "recall")])
+    return table(["Method", "AUROC", "PR-AUC", "F1", "IoU", "Precision", "Recall"], rows)
+
+
 def test_otsu(data: dict, **_) -> str:
     return metric_table(data["test"]["headline"], "otsu", "pooled")
 
@@ -171,7 +185,7 @@ def experiments(data: dict, **_) -> str:
                   "Validation PR-AUC", "Decision"], rows)
 
 
-RENDERERS = {f.__name__: f for f in (test_main, test_otsu, test_scene_mean, val_main, val_thresholds, paired,
+RENDERERS = {f.__name__: f for f in (test_main, test_combined, test_otsu, test_scene_mean, val_main, val_thresholds, paired,
                                      per_scene, case_studies, case_sites, case_fetch, experiments)}
 
 
