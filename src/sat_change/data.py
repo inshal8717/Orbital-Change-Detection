@@ -41,21 +41,27 @@ class ContrastivePatchDataset(Dataset):
         self.patch_size = patch_size
         self.samples_per_epoch = samples_per_epoch
         self.bands = bands
+        self._cache: dict[Path, np.ndarray] = {}  # normalised images, so each file is read and stretched once
 
     def __len__(self) -> int:
         return self.samples_per_epoch
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
-        path = self.paths[index % len(self.paths)]
-        arr, _ = read_image(path)
-        if arr.shape[0] < self.bands:
-            raise ValueError(f"{path} has {arr.shape[0]} band(s); the model expects {self.bands}")
-        arr = normalize_reflectance(arr[: self.bands])
-        _, h, w = arr.shape
-        if min(h, w) < self.patch_size:
-            pad_h, pad_w = max(0, self.patch_size - h), max(0, self.patch_size - w)
-            arr = np.pad(arr, ((0, 0), (0, pad_h), (0, pad_w)), mode="reflect")
+    def _load(self, path: Path) -> np.ndarray:
+        if path not in self._cache:
+            arr, _ = read_image(path)
+            if arr.shape[0] < self.bands:
+                raise ValueError(f"{path} has {arr.shape[0]} band(s); the model expects {self.bands}")
+            arr = normalize_reflectance(arr[: self.bands])
             _, h, w = arr.shape
+            if min(h, w) < self.patch_size:
+                pad_h, pad_w = max(0, self.patch_size - h), max(0, self.patch_size - w)
+                arr = np.pad(arr, ((0, 0), (0, pad_h), (0, pad_w)), mode="reflect")
+            self._cache[path] = arr
+        return self._cache[path]
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        arr = self._load(self.paths[index % len(self.paths)])
+        _, h, w = arr.shape
         y = random.randint(0, h - self.patch_size)
         x = random.randint(0, w - self.patch_size)
         patch = torch.from_numpy(arr[:, y:y + self.patch_size, x:x + self.patch_size].copy())

@@ -49,3 +49,56 @@ def _average_ranks(values: np.ndarray) -> np.ndarray:
     ranks = np.empty(values.size, dtype=np.float64)
     ranks[order] = mean_ranks[run_index]
     return ranks
+
+
+def _ranked_counts(score: np.ndarray, target: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray, int]:
+    """Distinct thresholds (descending) with the true and false positives when predicting ``score >= threshold``."""
+    s = score.ravel().astype(np.float64)
+    y = target.astype(bool).ravel()
+    order = np.argsort(-s, kind="stable")
+    s, y = s[order], y[order]
+    last_of_run = np.flatnonzero(np.r_[s[1:] != s[:-1], True])  # tied scores enter together
+    tp = np.cumsum(y)[last_of_run]
+    fp = (last_of_run + 1) - tp
+    return s[last_of_run], tp, fp, int(y.sum())
+
+
+def average_precision(score: np.ndarray, target: np.ndarray) -> float:
+    """Area under the precision-recall curve (step-wise sum, as in scikit-learn).
+
+    Returns NaN when there is no positive pixel.
+    """
+    _, tp, fp, n_pos = _ranked_counts(score, target)
+    if n_pos == 0:
+        return float("nan")
+    precision = tp / (tp + fp)
+    recall = tp / n_pos
+    return float(np.sum(np.diff(np.r_[0.0, recall]) * precision))
+
+
+def pr_curve(score: np.ndarray, target: np.ndarray, points: int = 101) -> dict[str, list[float]]:
+    """Precision at ``points`` evenly spaced recall levels, plus the thresholds that reach them."""
+    thresholds, tp, fp, n_pos = _ranked_counts(score, target)
+    if n_pos == 0:
+        return {"recall": [], "precision": [], "threshold": []}
+    recall = tp / n_pos
+    levels = np.linspace(0, 1, points)[1:]
+    index = np.minimum(np.searchsorted(recall, levels, side="left"), recall.size - 1)
+    return {
+        "recall": [float(v) for v in recall[index]],
+        "precision": [float(v) for v in tp[index] / (tp[index] + fp[index])],
+        "threshold": [float(v) for v in thresholds[index]],
+    }
+
+
+def best_f1_threshold(score: np.ndarray, target: np.ndarray) -> tuple[float, float]:
+    """The threshold ``t`` that maximises F1 of ``score >= t``, and that F1.
+
+    Pass the pooled pixels of several scenes to fit one global threshold.
+    """
+    thresholds, tp, fp, n_pos = _ranked_counts(score, target)
+    if n_pos == 0:
+        raise ValueError("cannot fit a threshold without any changed pixel")
+    f1 = 2 * tp / (2 * tp + fp + (n_pos - tp))
+    best = int(np.argmax(f1))
+    return float(thresholds[best]), float(f1[best])

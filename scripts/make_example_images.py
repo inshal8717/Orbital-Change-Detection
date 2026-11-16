@@ -26,7 +26,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from sat_change.io import normalize_pair, normalize_reflectance, pair_images, read_image, scene_key  # noqa: E402
+from sat_change import baselines  # noqa: E402
+from sat_change.io import pair_images, read_image, scene_key  # noqa: E402
 from sat_change.metrics import segmentation_metrics  # noqa: E402
 from sat_change.postprocess import binary_mask  # noqa: E402
 from sat_change.runtime import load_model, score_pair  # noqa: E402
@@ -38,20 +39,17 @@ UNCHANGED = (38, 44, 53)  # dark slate
 
 def per_photo_difference(before: Path, after: Path) -> np.ndarray:
     """Colour distance after stretching each photo on its own (the flawed scaling)."""
-    xb = normalize_reflectance(read_image(before)[0])
-    xa = normalize_reflectance(read_image(after)[0])
-    return np.sqrt(((xb - xa) ** 2).sum(0))
+    return baselines.per_photo_difference(read_image(before)[0], read_image(after)[0])
 
 
 def shared_difference(before: Path, after: Path) -> np.ndarray:
     """Colour distance after stretching both photos with one shared stretch."""
-    xb, xa = normalize_pair(read_image(before)[0], read_image(after)[0])
-    return np.sqrt(((xb - xa) ** 2).sum(0))
+    return baselines.shared_difference(read_image(before)[0], read_image(after)[0])
 
 
 def raw_difference(before: Path, after: Path) -> np.ndarray:
     """Per-pixel Euclidean distance between the raw before and after values, with no normalisation."""
-    return np.sqrt(((read_image(before)[0] - read_image(after)[0]) ** 2).sum(0))
+    return baselines.raw_difference(read_image(before)[0], read_image(after)[0])
 
 
 def write_png(path: Path, rgb: np.ndarray) -> None:
