@@ -27,6 +27,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--threshold", type=float, help="fixed threshold; default is Otsu on this scene")
     p.add_argument("--tile-size", type=int, default=512)
     p.add_argument("--overlap", type=int, default=32)
+    p.add_argument("--stretch", choices=("shared", "per_photo"), default="shared")
+    p.add_argument("--scale-weights", type=float, nargs=3, help="weights of the fine, middle and coarse feature scale")
+    p.add_argument("--fusion", choices=("mean", "geomean"), default="mean")
     p.add_argument("--device", default=default_device())
     return p.parse_args(argv)
 
@@ -34,7 +37,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> None:
     args = parse_args(argv)
     model = load_model(args.checkpoint, args.device)
-    score, profile = score_pair(model, args.before, args.after, args.device, args.tile_size, args.overlap)
+    score, profile = score_pair(model, args.before, args.after, args.device, args.tile_size, args.overlap,
+                                args.stretch, args.scale_weights, args.fusion)
     mask, threshold = binary_mask(score, args.threshold)
 
     output = Path(args.output)

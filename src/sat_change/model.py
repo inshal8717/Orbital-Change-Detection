@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -43,11 +45,33 @@ def nt_xent(z1: torch.Tensor, z2: torch.Tensor, temperature: float = 0.2) -> tor
 
 
 @torch.no_grad()
-def feature_change(model: SatelliteEncoder, before: torch.Tensor, after: torch.Tensor) -> torch.Tensor:
+def feature_change(
+    model: SatelliteEncoder,
+    before: torch.Tensor,
+    after: torch.Tensor,
+    scale_weights: Sequence[float] | None = None,
+    fusion: str = "mean",
+) -> torch.Tensor:
+    """Cosine distance between before and after features, fused over the three scales.
+
+    ``scale_weights`` weights the fine, middle and coarse stage (default: equal).
+    ``fusion`` is "mean" (weighted arithmetic mean) or "geomean" (weighted geometric mean).
+    """
     target_size = before.shape[-2:]
     scores = []
     for f1, f2 in zip(model.features(before), model.features(after)):
         f1, f2 = F.normalize(f1, dim=1), F.normalize(f2, dim=1)
         distance = 1 - (f1 * f2).sum(1, keepdim=True)
         scores.append(F.interpolate(distance, target_size, mode="bilinear", align_corners=False))
-    return torch.stack(scores).mean(0).squeeze(1)
+    stack = torch.stack(scores)
+    weights = torch.ones(len(scores)) if scale_weights is None else torch.tensor(list(scale_weights), dtype=torch.float32)
+    if weights.numel() != len(scores) or (weights < 0).any() or weights.sum() <= 0:
+        raise ValueError(f"scale_weights needs {len(scores)} non-negative values that are not all zero")
+    weights = (weights / weights.sum()).to(stack.device).view(-1, 1, 1, 1, 1)
+    if fusion == "mean":
+        fused = (stack * weights).sum(0)
+    elif fusion == "geomean":
+        fused = torch.exp((torch.log(stack.clamp_min(1e-6)) * weights).sum(0))
+    else:
+        raise ValueError(f"fusion must be 'mean' or 'geomean', not {fusion!r}")
+    return fused.squeeze(1)

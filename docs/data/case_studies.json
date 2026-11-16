@@ -1,0 +1,52 @@
+{
+  "note": "UAE sites for the v2 case studies. Fetch commands and results are generated from this file.",
+  "fetch": {"cloud_max": 10, "limit": 3, "scl_mask": false},
+  "sites": [
+    {
+      "key": "expo2020",
+      "name": "Expo 2020 site, Dubai South",
+      "center": [55.1508, 24.9608],
+      "size_km": 5,
+      "before": "2016-01-01/2016-02-29",
+      "after": "2022-01-01/2022-03-31",
+      "change": "Open desert became the Expo 2020 exhibition site. Site development began in March 2016 and the Expo ran from 1 October 2021 to 31 March 2022, so the first window is before any work and the second is while the Expo was open.",
+      "center_source": "Coordinates listed for Expo 2020 on Wikipedia (24.96083 N, 55.15083 E).",
+      "sources": [
+        {"title": "Gulf Construction: site development began in March 2016", "url": "https://gulfconstructiononline.com/Article/1625776/Eyeing_a_better_future"},
+        {"title": "Jacobs: 438-hectare site, open 1 October 2021 to 31 March 2022", "url": "https://www.jacobs.com/projects/Expo-2020-Dubai"},
+        {"title": "Wikipedia: Expo 2020 (coordinates, dates)", "url": "https://en.wikipedia.org/wiki/Expo_2020"}
+      ]
+    },
+    {
+      "key": "aldhafra_solar",
+      "name": "Al Dhafra Solar PV, Abu Dhabi",
+      "center": [54.5139, 24.1456],
+      "size_km": 8,
+      "before": "2020-01-01/2020-03-31",
+      "after": "2024-01-01/2024-03-31",
+      "change": "A 2 GW solar plant covering more than 20 square kilometres was built on open desert. Construction began in 2020, panel installation finished in April 2023 and the plant was inaugurated on 16 November 2023.",
+      "center_source": "Approximate plant coordinates from Global Energy Monitor (24.1456, 54.5139).",
+      "sources": [
+        {"title": "PV Tech: Masdar inaugurates 2 GW Al Dhafra project (17 November 2023)", "url": "https://www.pv-tech.org/masdar-inaugurates-worlds-largest-2gw-solar-project-in-abu-dhabi"},
+        {"title": "Masdar: Al Dhafra Solar PV project page (completed 2023)", "url": "https://masdar.ae/en/renewables/our-projects/al-dhafra-solar-pv"},
+        {"title": "Blackridge Research: timeline (construction from 2020, panels complete April 2023)", "url": "https://www.blackridgeresearch.com/project-profiles/al-dhafra-solar-plant-abu-dhabi-dubai-uae"},
+        {"title": "Global Energy Monitor: Al Dhafra solar farm (approximate coordinates)", "url": "https://gem.wiki/Al_Dhafra_solar_farm"}
+      ]
+    },
+    {
+      "key": "mbr_solar",
+      "name": "Mohammed bin Rashid Al Maktoum Solar Park, Dubai",
+      "center": [55.4237, 24.7254],
+      "size_km": 8,
+      "before": "2019-01-01/2019-03-31",
+      "after": "2024-01-01/2024-03-31",
+      "change": "New solar arrays were added to an existing solar park. Between the two windows DEWA commissioned the later stages of phase 3 (2019 to 2020), phase 5 (900 MW, August 2021 to June 2023) and phase 4 (950 MW, 2023). The scene also keeps part of the older arrays, which did not change.",
+      "center_source": "The park's listed coordinates (24.7547 N, 55.365 E, Wikipedia) fall on arrays that already existed in 2019. The scene centre was moved about 6.7 km to the south-east, onto the new arrays, after looking at a 20 km Sentinel-2 view of the park. Which phase each new block belongs to is not confirmed by a source.",
+      "sources": [
+        {"title": "PV Tech: 900 MW fifth phase inaugurated (19 June 2023)", "url": "https://www.pv-tech.org/uae-inaugurates-900mw-fifth-phase-of-mohammed-bin-rashid-al-maktoum-solar-park"},
+        {"title": "SolarQuarter: phases 4 and 5 commissioned in 2023, phase 6 under development", "url": "https://solarquarter.com/2025/06/10/dewa-boosts-clean-energy-capacity-to-3860mw-at-mohammed-bin-rashid-al-maktoum-solar-park/"},
+        {"title": "Wikipedia: Mohammed bin Rashid Al Maktoum Solar Park (coordinates, phase dates)", "url": "https://en.wikipedia.org/wiki/Mohammed_bin_Rashid_Al_Maktoum_Solar_Park"}
+      ]
+    }
+  ]
+}

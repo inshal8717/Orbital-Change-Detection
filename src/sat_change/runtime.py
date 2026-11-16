@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 import numpy as np
 import torch
@@ -46,6 +47,8 @@ def score_pair(
     tile_size: int = 512,
     overlap: int = 32,
     stretch: str = "shared",
+    scale_weights: Sequence[float] | None = None,
+    fusion: str = "mean",
 ) -> tuple[np.ndarray, dict]:
     """Dense change score (H x W) for a registered before/after pair.
 
@@ -56,6 +59,8 @@ def score_pair(
     photos. "shared" (default) uses one stretch for both dates. "per_photo"
     stretches each date on its own, which makes a large change in one date shift
     the scale of the whole scene; it is kept only to reproduce the old results.
+
+    ``scale_weights`` and ``fusion`` are passed to ``feature_change``.
     """
     if tile_size < 16 or tile_size <= overlap:
         raise ValueError("tile_size must be at least 16 and greater than overlap")
@@ -80,7 +85,7 @@ def score_pair(
         for y in tile_starts(h, tile_size, step):
             for x in tile_starts(w, tile_size, step):
                 window = (slice(None), slice(y, min(y + tile_size, h)), slice(x, min(x + tile_size, w)))
-                score = feature_change(model, a[window][None].to(device), b[window][None].to(device))[0].cpu().numpy()
+                score = feature_change(model, a[window][None].to(device), b[window][None].to(device), scale_weights, fusion)[0].cpu().numpy()
                 th, tw = score.shape
                 total[y:y + th, x:x + tw] += score
                 weights[y:y + th, x:x + tw] += 1
