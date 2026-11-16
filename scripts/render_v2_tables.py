@@ -134,6 +134,35 @@ def case_studies(data: dict, **_) -> str:
                   "Marked by the colour difference", "Overlap of the two masks (IoU)"], rows)
 
 
+def case_sites(data: dict, **_) -> str:
+    rows = []
+    for s in data["sites"]:
+        lon, lat = s["center"]
+        sources = "; ".join(f"[{src['title']}]({src['url']})" for src in s["sources"])
+        rows.append([f"**{s['name']}** (`{s['key']}`)", s["change"], f"{lat:.4f} N, {lon:.4f} E. {s['center_source']}",
+                     f"{s['size_km']} km", s["before"].replace("/", " to "), s["after"].replace("/", " to "), sources])
+    header = ["Site", "What changed, and when", "Scene centre (`--center` is lon,lat)", "Size", "Before window",
+              "After window", "Sources"]
+    lines = ["| " + " | ".join(header) + " |", "| " + " | ".join(["---"] * len(header)) + " |"]
+    lines += ["| " + " | ".join(row) + " |" for row in rows]
+    return "\n".join(lines) + "\n"
+
+
+def case_fetch(data: dict, **_) -> str:
+    out = []
+    for s in data["sites"]:
+        out.append(f"**{s['name']}**\n\n```bash\n{s['fetch_command']}\n```\n")
+        rows = []
+        for label in ("before", "after"):
+            for a in s["acquisitions"][label]:
+                rows.append([label, a["date"], f"`{a['id']}`", f"{a['cloud_cover']:.2f}%", str(a["processing_baseline"]),
+                             "yes" if a["boa_offset_removed"] else "no"])
+        out.append(table(["Window", "Date", "Sentinel-2 acquisition", "Cloud cover of the tile", "Processing baseline",
+                          "1000 offset removed"], rows))
+        out.append(f"Output grid: {s['height']} × {s['width']} pixels at 10 m, both dates on the same grid.\n")
+    return "\n".join(out)
+
+
 def experiments(data: dict, **_) -> str:
     rows = []
     for e in data["experiments"]:
@@ -143,7 +172,7 @@ def experiments(data: dict, **_) -> str:
 
 
 RENDERERS = {f.__name__: f for f in (test_main, test_otsu, test_scene_mean, val_main, val_thresholds, paired,
-                                     per_scene, case_studies, experiments)}
+                                     per_scene, case_studies, case_sites, case_fetch, experiments)}
 
 
 def render(text: str) -> str:

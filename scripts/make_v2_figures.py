@@ -110,7 +110,7 @@ def panels(args: argparse.Namespace) -> None:
         fig.suptitle(f"{scene.key} ({args.split} split). White: correctly marked. Orange: wrongly marked. Blue: missed.",
                      fontsize=10)
         fig.tight_layout()
-        fig.savefig(out_dir / f"{args.prefix}{args.split}_{scene.key}.png")
+        fig.savefig(out_dir / f"{args.prefix}{args.split}_{scene.key}.jpg", pil_kwargs={"quality": 88})
         plt.close(fig)
     (out_dir / f"{args.prefix}{args.split}_panels.json").write_text(json.dumps({
         "config": config["name"], "seed": args.seed, "thresholds": thresholds, "scenes": summary}, indent=2) + "\n")

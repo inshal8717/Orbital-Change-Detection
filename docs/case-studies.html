@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case studies: change seen from space in the UAE</title>
+<style>
+:root { color-scheme: light dark; --fg: #1c2330; --muted: #5b6577; --bg: #f7f8fa; --card: #ffffff; --line: #d9dee7;
+        --model: #ff8c00; --diff: #00a8d6; }
+@media (prefers-color-scheme: dark) { :root { --fg: #e8ecf3; --muted: #9aa5b8; --bg: #12161d; --card: #1a2029; --line: #2c3545; } }
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); background: var(--bg); }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 1.6rem; line-height: 1.25; margin: 0 0 8px; }
+h2 { font-size: 1.2rem; margin: 40px 0 6px; }
+p { margin: 8px 0; }
+.note, figcaption { color: var(--muted); font-size: 0.9rem; }
+a { color: inherit; }
+figure { margin: 14px 0; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.compare { position: relative; width: 100%; overflow: hidden; border-radius: 8px; line-height: 0; touch-action: pan-y; }
+.compare img { width: 100%; height: auto; display: block; }
+.compare img.layer { position: absolute; inset: 0; height: 100%; }
+.compare .line { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.45); pointer-events: none; }
+.compare .tag { position: absolute; top: 8px; padding: 2px 8px; border-radius: 999px; font: 600 12px/1.6 system-ui, sans-serif;
+                color: #fff; background: rgba(0,0,0,.6); }
+.compare .tag.left { left: 8px; } .compare .tag.right { right: 8px; }
+.controls { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin-top: 10px; font-size: 0.92rem; }
+.controls input[type=range] { flex: 1 1 100%; width: 100%; accent-color: var(--fg); }
+.controls label { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+table { border-collapse: collapse; font-size: 0.92rem; margin: 8px 0; }
+td, th { padding: 4px 12px 4px 0; text-align: left; vertical-align: top; }
+th { color: var(--muted); font-weight: 600; }
+ul { padding-left: 20px; margin: 6px 0; }
+</style>
+</head>
+<body>
+<main>
+<h1>Case studies: three places in the UAE that changed</h1>
+<p>Each picture below is two real Sentinel-2 photos of the same place. Drag the slider to move between them. The
+coloured marks are what each method flagged as changed. There is no answer key for these sites, so the marks are
+shown for inspection and are not scored.</p>
+<p class="note">Model: <code>baseline</code>, seed 42. Both thresholds were fitted
+on labelled validation scenes of the OSCD benchmark and applied here unchanged. Full write-up:
+<a href="CASE_STUDIES.md">CASE_STUDIES.md</a>. Benchmark results: <a href="V2_RESULTS.md">V2_RESULTS.md</a>.
+<a href="index.html">Back to the project page</a>.</p>
+
+<h2>Expo 2020 site, Dubai South</h2>
+<p>Open desert became the Expo 2020 exhibition site. Site development began in March 2016 and the Expo ran from 1 October 2021 to 31 March 2022, so the first window is before any work and the second is while the Expo was open.</p>
+<figure>
+  <div class="compare">
+    <img src="img/v2/case_expo2020_after.jpg" alt="Expo 2020 site, Dubai South, after (2022-03-14)" width="508" height="508">
+    <img class="layer model" src="img/v2/case_expo2020_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_expo2020_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_expo2020_before.jpg" alt="Expo 2020 site, Dubai South, before (2016-01-20)">
+    <div class="line"></div>
+    <span class="tag left">Before 2016</span>
+    <span class="tag right">After 2022</span>
+  </div>
+  <div class="controls">
+    <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
+    <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
+      Trained network (33% of the scene)</label>
+    <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
+      Colour difference (21% of the scene)</label>
+  </div>
+  <figcaption>5 km across, 10 m per pixel. Before: best of 2016-01-01 to 2016-02-29.
+  After: best of 2022-01-01 to 2022-03-31. The marks are drawn on the after image, so they show to the
+  right of the slider line. Contains modified Copernicus Sentinel data.</figcaption>
+</figure>
+<p class="note">Sources for the change and its dates:</p>
+<ul class="note"><li><a href="https://gulfconstructiononline.com/Article/1625776/Eyeing_a_better_future">Gulf Construction: site development began in March 2016</a></li><li><a href="https://www.jacobs.com/projects/Expo-2020-Dubai">Jacobs: 438-hectare site, open 1 October 2021 to 31 March 2022</a></li><li><a href="https://en.wikipedia.org/wiki/Expo_2020">Wikipedia: Expo 2020 (coordinates, dates)</a></li></ul>
+
+<h2>Al Dhafra Solar PV, Abu Dhabi</h2>
+<p>A 2 GW solar plant covering more than 20 square kilometres was built on open desert. Construction began in 2020, panel installation finished in April 2023 and the plant was inaugurated on 16 November 2023.</p>
+<figure>
+  <div class="compare">
+    <img src="img/v2/case_aldhafra_solar_after.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, after (2024-01-08)" width="816" height="816">
+    <img class="layer model" src="img/v2/case_aldhafra_solar_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_aldhafra_solar_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_aldhafra_solar_before.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, before (2020-01-04)">
+    <div class="line"></div>
+    <span class="tag left">Before 2020</span>
+    <span class="tag right">After 2024</span>
+  </div>
+  <div class="controls">
+    <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
+    <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
+      Trained network (34% of the scene)</label>
+    <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
+      Colour difference (28% of the scene)</label>
+  </div>
+  <figcaption>8 km across, 10 m per pixel. Before: best of 2020-01-01 to 2020-03-31.
+  After: best of 2024-01-01 to 2024-03-31. The marks are drawn on the after image, so they show to the
+  right of the slider line. Contains modified Copernicus Sentinel data.</figcaption>
+</figure>
+<p class="note">Sources for the change and its dates:</p>
+<ul class="note"><li><a href="https://www.pv-tech.org/masdar-inaugurates-worlds-largest-2gw-solar-project-in-abu-dhabi">PV Tech: Masdar inaugurates 2 GW Al Dhafra project (17 November 2023)</a></li><li><a href="https://masdar.ae/en/renewables/our-projects/al-dhafra-solar-pv">Masdar: Al Dhafra Solar PV project page (completed 2023)</a></li><li><a href="https://www.blackridgeresearch.com/project-profiles/al-dhafra-solar-plant-abu-dhabi-dubai-uae">Blackridge Research: timeline (construction from 2020, panels complete April 2023)</a></li><li><a href="https://gem.wiki/Al_Dhafra_solar_farm">Global Energy Monitor: Al Dhafra solar farm (approximate coordinates)</a></li></ul>
+
+<h2>Mohammed bin Rashid Al Maktoum Solar Park, Dubai</h2>
+<p>New solar arrays were added to an existing solar park. Between the two windows DEWA commissioned the later stages of phase 3 (2019 to 2020), phase 5 (900 MW, August 2021 to June 2023) and phase 4 (950 MW, 2023). The scene also keeps part of the older arrays, which did not change.</p>
+<figure>
+  <div class="compare">
+    <img src="img/v2/case_mbr_solar_after.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, after (2024-03-18)" width="810" height="812">
+    <img class="layer model" src="img/v2/case_mbr_solar_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_mbr_solar_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_mbr_solar_before.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, before (2019-03-05)">
+    <div class="line"></div>
+    <span class="tag left">Before 2019</span>
+    <span class="tag right">After 2024</span>
+  </div>
+  <div class="controls">
+    <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
+    <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
+      Trained network (20% of the scene)</label>
+    <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
+      Colour difference (18% of the scene)</label>
+  </div>
+  <figcaption>8 km across, 10 m per pixel. Before: best of 2019-01-01 to 2019-03-31.
+  After: best of 2024-01-01 to 2024-03-31. The marks are drawn on the after image, so they show to the
+  right of the slider line. Contains modified Copernicus Sentinel data.</figcaption>
+</figure>
+<p class="note">Sources for the change and its dates:</p>
+<ul class="note"><li><a href="https://www.pv-tech.org/uae-inaugurates-900mw-fifth-phase-of-mohammed-bin-rashid-al-maktoum-solar-park">PV Tech: 900 MW fifth phase inaugurated (19 June 2023)</a></li><li><a href="https://solarquarter.com/2025/06/10/dewa-boosts-clean-energy-capacity-to-3860mw-at-mohammed-bin-rashid-al-maktoum-solar-park/">SolarQuarter: phases 4 and 5 commissioned in 2023, phase 6 under development</a></li><li><a href="https://en.wikipedia.org/wiki/Mohammed_bin_Rashid_Al_Maktoum_Solar_Park">Wikipedia: Mohammed bin Rashid Al Maktoum Solar Park (coordinates, phase dates)</a></li></ul>
+
+</main>
+<script>
+document.querySelectorAll('figure').forEach(function (figure) {
+  var compare = figure.querySelector('.compare');
+  var range = figure.querySelector('input[type=range]');
+  var before = compare.querySelector('.before');
+  var line = compare.querySelector('.line');
+  function set() {
+    before.style.clipPath = 'inset(0 ' + (100 - range.value) + '% 0 0)';
+    line.style.left = 'calc(' + range.value + '% - 1px)';
+  }
+  range.addEventListener('input', set);
+  set();
+  figure.querySelectorAll('input[type=checkbox]').forEach(function (box) {
+    var layer = compare.querySelector('.' + box.dataset.layer);
+    function show() { layer.style.display = box.checked ? 'block' : 'none'; }
+    box.addEventListener('change', show);
+    show();
+  });
+});
+</script>
+</body>
+</html>

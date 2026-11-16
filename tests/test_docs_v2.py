@@ -7,7 +7,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = [ROOT / "README.md", ROOT / "docs" / "V2_RESULTS.md", ROOT / "docs" / "CASE_STUDIES.md",
-        ROOT / "docs" / "V2_EXPERIMENTS.md", ROOT / "docs" / "V2_IMPROVEMENT_SUMMARY.md", ROOT / "docs" / "DATA_SOURCES.md"]
+        ROOT / "docs" / "V2_EXPERIMENTS.md", ROOT / "docs" / "V2_IMPROVEMENT_SUMMARY.md", ROOT / "docs" / "DATA_SOURCES.md",
+        ROOT / "docs" / "case-studies.html"]
 
 
 def test_result_tables_are_generated_from_the_result_files():

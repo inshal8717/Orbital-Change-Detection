@@ -83,6 +83,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--outputs", default=str(ROOT / "outputs" / "v2"))
     p.add_argument("--figures", default=str(ROOT / "docs" / "img" / "v2"))
     p.add_argument("--report", default=str(ROOT / "docs" / "data" / "v2_case_studies.json"))
+    p.add_argument("--tag", default="", help="inserted into figure names and output folders, e.g. 'final_'")
     args = p.parse_args(argv)
 
     spec = json.loads(Path(args.sites).read_text())
@@ -99,7 +100,7 @@ def main(argv: list[str] | None = None) -> None:
     figures = Path(args.figures)
     figures.mkdir(parents=True, exist_ok=True)
 
-    report = {"config": config["name"], "seed": args.seed, "thresholds": thresholds,
+    report = {"config": config["name"], "seed": args.seed, "tag": args.tag, "thresholds": thresholds,
               "threshold_source": "fitted on the OSCD validation scenes (Level-1C); applied here to Level-2A imagery",
               "fetch": spec["fetch"], "sites": []}
     for site in spec["sites"]:
@@ -110,7 +111,7 @@ def main(argv: list[str] | None = None) -> None:
         if len(pairs) != 1:
             raise SystemExit(f"expected one before/after pair in {Path(args.data) / key}; run with --fetch")
         before_path, after_path = pairs[0]
-        out = Path(args.outputs) / key
+        out = Path(args.outputs) / f"{args.tag}{key}"
         out.mkdir(parents=True, exist_ok=True)
 
         predict_args = ["--before", str(before_path), "--after", str(after_path), "--checkpoint", str(checkpoint),
@@ -153,12 +154,12 @@ def main(argv: list[str] | None = None) -> None:
         fig.suptitle(f"{site['name']}. {site['size_km']} km across. Windows {site['before']} and {site['after']}. "
                      "Contains modified Copernicus Sentinel data.", fontsize=9)
         fig.tight_layout()
-        fig.savefig(figures / f"case_{key}.png")
+        fig.savefig(figures / f"case_{args.tag}{key}.jpg", pil_kwargs={"quality": 88})
         plt.close(fig)
-        plt.imsave(figures / f"case_{key}_before.jpg", before_rgb, pil_kwargs={"quality": 85})
-        plt.imsave(figures / f"case_{key}_after.jpg", after_rgb, pil_kwargs={"quality": 85})
-        save_rgba(figures / f"case_{key}_model.png", masks["model"], MODEL_COLOUR)
-        save_rgba(figures / f"case_{key}_diff.png", masks["diff"], DIFF_COLOUR)
+        plt.imsave(figures / f"case_{args.tag}{key}_before.jpg", before_rgb, pil_kwargs={"quality": 85})
+        plt.imsave(figures / f"case_{args.tag}{key}_after.jpg", after_rgb, pil_kwargs={"quality": 85})
+        save_rgba(figures / f"case_{args.tag}{key}_model.png", masks["model"], MODEL_COLOUR)
+        save_rgba(figures / f"case_{args.tag}{key}_diff.png", masks["diff"], DIFF_COLOUR)
 
         both = masks["model"] & masks["diff"]
         either = masks["model"] | masks["diff"]

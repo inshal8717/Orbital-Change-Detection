@@ -1,0 +1,212 @@
+{
+  "config": "baseline",
+  "seed": 42,
+  "tag": "",
+  "thresholds": {
+    "model": 0.5655556917190552,
+    "diff": 0.8069392442703247
+  },
+  "threshold_source": "fitted on the OSCD validation scenes (Level-1C); applied here to Level-2A imagery",
+  "fetch": {
+    "cloud_max": 10,
+    "limit": 3,
+    "scl_mask": false
+  },
+  "sites": [
+    {
+      "key": "expo2020",
+      "name": "Expo 2020 site, Dubai South",
+      "height": 508,
+      "width": 508,
+      "before_date": "2016-01-20",
+      "after_date": "2022-03-14",
+      "acquisitions": {
+        "before": [
+          {
+            "id": "S2A_MSIL2A_20160120T065212_R020_T40RCN_20210527T203424",
+            "date": "2016-01-20",
+            "cloud_cover": 2.693181,
+            "processing_baseline": "03.00",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2A_MSIL2A_20160219T064922_R020_T40RCN_20210528T083408",
+            "date": "2016-02-19",
+            "cloud_cover": 3.072278,
+            "processing_baseline": "03.00",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2A_MSIL2A_20160209T065032_R020_T40RCN_20210528T041938",
+            "date": "2016-02-09",
+            "cloud_cover": 5.913736,
+            "processing_baseline": "03.00",
+            "boa_offset_removed": 0.0
+          }
+        ],
+        "after": [
+          {
+            "id": "S2B_MSIL2A_20220314T064639_R020_T40RCN_20240526T072428",
+            "date": "2022-03-14",
+            "cloud_cover": 0.020256,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2B_MSIL2A_20220314T064639_R020_T40RCN_20220314T182045",
+            "date": "2022-03-14",
+            "cloud_cover": 0.020898,
+            "processing_baseline": "04.00",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2B_MSIL2A_20220212T065009_R020_T40RCN_20220222T045704",
+            "date": "2022-02-12",
+            "cloud_cover": 0.032993,
+            "processing_baseline": "04.00",
+            "boa_offset_removed": 1000.0
+          }
+        ]
+      },
+      "fetch_command": "python scripts/fetch_sentinel2.py --center=55.1508,24.9608 --size 5 --before 2016-01-01/2016-02-29 --after 2022-01-01/2022-03-31 --scene expo2020 --output data/real --cloud-max 10 --limit 3 --no-scl",
+      "model_marked_fraction": 0.3334250418500837,
+      "diff_marked_fraction": 0.20624341248682498,
+      "marked_by_both_fraction": 0.1840279930559861,
+      "agreement_iou": 0.5174551635468195,
+      "model_otsu_threshold": 0.5099964872592864,
+      "diff_otsu_threshold": 0.5818622317165136,
+      "model_score_median": 0.318828821182251,
+      "diff_score_median": 0.35288453102111816
+    },
+    {
+      "key": "aldhafra_solar",
+      "name": "Al Dhafra Solar PV, Abu Dhabi",
+      "height": 816,
+      "width": 816,
+      "before_date": "2020-01-04",
+      "after_date": "2024-01-08",
+      "acquisitions": {
+        "before": [
+          {
+            "id": "S2B_MSIL2A_20200104T065249_R020_T40QBM_20201002T225332",
+            "date": "2020-01-04",
+            "cloud_cover": 0.0984,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2B_MSIL2A_20200104T065249_R020_T39QZG_20201002T225336",
+            "date": "2020-01-04",
+            "cloud_cover": 0.100099,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2B_MSIL2A_20200107T070249_R063_T40QBM_20201029T121609",
+            "date": "2020-01-07",
+            "cloud_cover": 0.163685,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          }
+        ],
+        "after": [
+          {
+            "id": "S2A_MSIL2A_20240108T065251_R020_T39QZG_20240108T113844",
+            "date": "2024-01-08",
+            "cloud_cover": 0.101856,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2A_MSIL2A_20240108T065251_R020_T40QBM_20240108T111557",
+            "date": "2024-01-08",
+            "cloud_cover": 0.103799,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2A_MSIL2A_20240210T070031_R063_T39QZG_20240210T121118",
+            "date": "2024-02-10",
+            "cloud_cover": 0.133707,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          }
+        ]
+      },
+      "fetch_command": "python scripts/fetch_sentinel2.py --center=54.5139,24.1456 --size 8 --before 2020-01-01/2020-03-31 --after 2024-01-01/2024-03-31 --scene aldhafra_solar --output data/real --cloud-max 10 --limit 3 --no-scl",
+      "model_marked_fraction": 0.33619881776239907,
+      "diff_marked_fraction": 0.27633302095347945,
+      "marked_by_both_fraction": 0.26977604767397156,
+      "agreement_iou": 0.7870794738548632,
+      "model_otsu_threshold": 0.49902530827040437,
+      "diff_otsu_threshold": 0.6191644293721765,
+      "model_score_median": 0.14230012893676758,
+      "diff_score_median": 0.22174495458602905
+    },
+    {
+      "key": "mbr_solar",
+      "name": "Mohammed bin Rashid Al Maktoum Solar Park, Dubai",
+      "height": 812,
+      "width": 810,
+      "before_date": "2019-03-05",
+      "after_date": "2024-03-18",
+      "acquisitions": {
+        "before": [
+          {
+            "id": "S2A_MSIL2A_20190305T064741_R020_T40RCN_20201030T153903",
+            "date": "2019-03-05",
+            "cloud_cover": 0.447882,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2B_MSIL2A_20190208T065029_R020_T40RCN_20201007T150731",
+            "date": "2019-02-08",
+            "cloud_cover": 0.635607,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          },
+          {
+            "id": "S2B_MSIL2A_20190218T064929_R020_T40RCN_20201007T181029",
+            "date": "2019-02-18",
+            "cloud_cover": 0.681368,
+            "processing_baseline": "02.12",
+            "boa_offset_removed": 0.0
+          }
+        ],
+        "after": [
+          {
+            "id": "S2A_MSIL2A_20240318T064621_R020_T40RCN_20240318T123327",
+            "date": "2024-03-18",
+            "cloud_cover": 0.059479,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2B_MSIL2A_20240313T064639_R020_T40RCN_20240313T120500",
+            "date": "2024-03-13",
+            "cloud_cover": 0.177475,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          },
+          {
+            "id": "S2B_MSIL2A_20240222T064909_R020_T40RCN_20240222T113956",
+            "date": "2024-02-22",
+            "cloud_cover": 0.414637,
+            "processing_baseline": "05.10",
+            "boa_offset_removed": 1000.0
+          }
+        ]
+      },
+      "fetch_command": "python scripts/fetch_sentinel2.py --center=55.4237,24.7254 --size 8 --before 2019-01-01/2019-03-31 --after 2024-01-01/2024-03-31 --scene mbr_solar --output data/real --cloud-max 10 --limit 3 --no-scl",
+      "model_marked_fraction": 0.1952730645259381,
+      "diff_marked_fraction": 0.1809873502402238,
+      "marked_by_both_fraction": 0.15237943197713313,
+      "agreement_iou": 0.6806269566929936,
+      "model_otsu_threshold": 0.4755407761388142,
+      "diff_otsu_threshold": 0.6118561094626784,
+      "model_score_median": 0.11795898526906967,
+      "diff_score_median": 0.2595992088317871
+    }
+  ]
+}

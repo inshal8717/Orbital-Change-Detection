@@ -146,18 +146,18 @@ A result that flips between two sets of scenes is not evidence of a benefit.
    shadows, bluish) and the second from late August. The network marks most of the city. The colour difference is
    noisy here too but marks far less.
 
-   ![bercy, validation scene](img/v2/baseline_val_bercy.png)
+   ![bercy, validation scene](img/v2/baseline_val_bercy.jpg)
 
 2. **The score scale drifts between scenes, so one threshold misfires.** In `abudhabi` the threshold fitted across
    all validation scenes is too high for this scene, and the network misses most of the real construction (blue).
 
-   ![abudhabi, validation scene](img/v2/baseline_val_abudhabi.png)
+   ![abudhabi, validation scene](img/v2/baseline_val_abudhabi.jpg)
 
 3. **Clouds and their shadows are marked as change.** In `paris` the second image contains two clouds and a cloud
    shadow. Both methods mark them. The network marks them as large solid blobs, which swamp the 0.3% of pixels that
    really changed.
 
-   ![paris, validation scene](img/v2/baseline_val_paris.png)
+   ![paris, validation scene](img/v2/baseline_val_paris.jpg)
 
 On the test scenes the same weakness shows in the numbers: for `norcia`, `saclay_w` and `valencia` the trained
 network's AUROC is between 0.20 and 0.39, which is worse than guessing. Its scores are highest where nothing in the mask
