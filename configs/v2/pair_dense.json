@@ -1,0 +1,21 @@
+{
+  "name": "pair_dense",
+  "description": "baseline + dense temporal contrastive loss on co-located before/after patches of the train scenes (no labels).",
+  "train": {
+    "epochs": 10,
+    "samples_per_epoch": 2048,
+    "batch_size": 64,
+    "patch_size": 64,
+    "width": 32,
+    "projection_dim": 128,
+    "temperature": 0.2,
+    "lr": 0.0003,
+    "pair_weight": 1.0,
+    "pair_points": 16
+  },
+  "score": {
+    "stretch": "shared",
+    "tile_size": 512,
+    "overlap": 32
+  }
+}
