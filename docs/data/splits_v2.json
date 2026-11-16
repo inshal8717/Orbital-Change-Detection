@@ -1,0 +1,38 @@
+{
+  "dataset": "OSCD (Onera Satellite Change Detection)",
+  "rule": "test = OSCD official test scenes; val = n_val scenes drawn from the official training scenes with random.Random(seed).sample(sorted(train), n_val); train = the rest",
+  "seed": 42,
+  "n_val": 5,
+  "splits": {
+    "train": [
+      "beihai",
+      "bordeaux",
+      "cupertino",
+      "hongkong",
+      "mumbai",
+      "nantes",
+      "pisa",
+      "rennes",
+      "saclay_e"
+    ],
+    "val": [
+      "abudhabi",
+      "aguasclaras",
+      "beirut",
+      "bercy",
+      "paris"
+    ],
+    "test": [
+      "brasilia",
+      "chongqing",
+      "dubai",
+      "lasvegas",
+      "milano",
+      "montpellier",
+      "norcia",
+      "rio",
+      "saclay_w",
+      "valencia"
+    ]
+  }
+}

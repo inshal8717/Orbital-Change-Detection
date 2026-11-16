@@ -6,3 +6,7 @@ __pycache__/
 outputs/*
 !outputs/.gitkeep
 
+
+# v2 benchmark download (OSCD). Raw archives and converted scenes stay out of git.
+/data/benchmark/
+*.egg-info/
