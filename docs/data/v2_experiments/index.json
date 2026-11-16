@@ -77,6 +77,97 @@
       "primary_mean": 0.20207478715599805,
       "primary_std": 0.0036966039504073003,
       "config": "scale_fine_mid"
+    },
+    {
+      "id": "3",
+      "change": "Add a dense temporal loss on before/after pairs of the train scenes",
+      "kind": "model (training)",
+      "seeds": "42, 43, 44",
+      "primary": "0.275 \u00b1 0.001",
+      "delta": "+0.073",
+      "ap": "0.201 \u00b1 0.009",
+      "decision": "kept",
+      "primary_mean": 0.2749502078836706,
+      "primary_std": 0.0009456272972876917,
+      "config": "pair_dense_fine_mid"
+    },
+    {
+      "id": "4a",
+      "change": "Put the coarse scale back (weights of experiment 3)",
+      "kind": "model (scoring)",
+      "seeds": "42, 43, 44",
+      "primary": "0.265 \u00b1 0.006",
+      "delta": "-0.010",
+      "ap": "0.192 \u00b1 0.003",
+      "decision": "discarded",
+      "primary_mean": 0.264524436026447,
+      "primary_std": 0.0057861768036017325,
+      "config": "pair_dense"
+    },
+    {
+      "id": "6",
+      "change": "Contrastive temperature 0.1 instead of 0.2",
+      "kind": "model (training)",
+      "seeds": "42, 43, 44",
+      "primary": "0.292 \u00b1 0.003",
+      "delta": "+0.017",
+      "ap": "0.240 \u00b1 0.009",
+      "decision": "kept, final",
+      "primary_mean": 0.29210884272678966,
+      "primary_std": 0.0034541524138903337,
+      "config": "pair_dense_t01"
+    },
+    {
+      "id": "4b",
+      "change": "Put the coarse scale back (weights of experiment 6)",
+      "kind": "model (scoring)",
+      "seeds": "42, 43, 44",
+      "primary": "0.287 \u00b1 0.012",
+      "delta": "-0.005",
+      "ap": "0.237 \u00b1 0.007",
+      "decision": "discarded",
+      "primary_mean": 0.2874256972300596,
+      "primary_std": 0.011625120104086121,
+      "config": "pair_dense_t01_three_scales"
+    },
+    {
+      "id": "5",
+      "change": "Remove marked groups smaller than 8 pixels",
+      "kind": "post-processing",
+      "seeds": "42, 43, 44",
+      "primary": "0.294 \u00b1 0.003",
+      "delta": "+0.001",
+      "ap": "0.240 \u00b1 0.009",
+      "decision": "discarded",
+      "primary_mean": 0.29350919694894684,
+      "primary_std": 0.003397250336257118,
+      "config": "pair_dense_t01_post8"
+    },
+    {
+      "id": "ref-d",
+      "change": "Reference: colour difference, shared stretch, with the same 8-pixel filter",
+      "kind": "reference",
+      "seeds": "none",
+      "primary": "0.264",
+      "delta": "+0.040",
+      "ap": "0.141",
+      "decision": "reference",
+      "primary_mean": 0.2644137986490833,
+      "primary_std": 0.0,
+      "config": "pair_dense_t01_post8"
+    },
+    {
+      "id": "ref-e",
+      "change": "Reference: colour difference, raw values, with the same 8-pixel filter",
+      "kind": "reference",
+      "seeds": "none",
+      "primary": "0.320",
+      "delta": "+0.052",
+      "ap": "0.181",
+      "decision": "strongest reference",
+      "primary_mean": 0.3195454732256606,
+      "primary_std": 0.0,
+      "config": "pair_dense_t01_post8"
     }
   ]
 }

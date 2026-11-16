@@ -168,7 +168,34 @@ were commissioned between the two dates. Contains modified Copernicus Sentinel d
 - **Wrongly marked.** Little. The older arrays in the north-west, which did not change, are correctly left alone by
   both methods.
 
-## 5. What the case studies say
+## 5. The same sites with the improved model
+
+After the model-improvement loop ([`V2_IMPROVEMENT_SUMMARY.md`](V2_IMPROVEMENT_SUMMARY.md)) the three sites were run
+again with the final model (`configs/v2/pair_dense_t01.json`, seed 42) and its own validation-fitted threshold. The
+colour difference is unchanged. The slider page shows this model.
+
+<!-- v2:case_studies file=v2_case_studies_final.json -->
+| Site | Dates of the best acquisition in each window | Size (pixels) | Marked by the trained network | Marked by the colour difference | Overlap of the two masks (IoU) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Expo 2020 site, Dubai South | 2016-01-20 to 2022-03-14 | 508 × 508 | 37.4% | 20.6% | 0.46 |
+| Al Dhafra Solar PV, Abu Dhabi | 2020-01-04 to 2024-01-08 | 816 × 816 | 29.9% | 27.6% | 0.86 |
+| Mohammed bin Rashid Al Maktoum Solar Park, Dubai | 2019-03-05 to 2024-03-18 | 812 × 810 | 18.7% | 18.1% | 0.65 |
+<!-- /v2 -->
+
+![Al Dhafra Solar PV with the improved model](img/v2/case_final_aldhafra_solar.jpg)
+
+![Expo 2020 site with the improved model](img/v2/case_final_expo2020.jpg)
+
+![MBR Solar Park with the improved model](img/v2/case_final_mbr_solar.jpg)
+
+- **Al Dhafra.** Cleaner. The false patches on the dunes are almost gone and the mask follows the plant boundary.
+- **Expo 2020.** The site is still found as one solid region. The model now also marks the roads along the northern
+  edge, where the two images show a roundabout replaced by a large interchange, and it still marks a few patches of
+  open desert in the south-east.
+- **MBR Solar Park.** No better. The mirror field and the grey arrays are still mostly unmarked. Training on OSCD's
+  city pairs did not teach the model this kind of low-contrast change.
+
+## 6. What the case studies say
 
 - On big, high-contrast changes (dark panels or dense building on sand) the network and the colour difference agree,
   and the network's mask is cleaner. That fits how the network works, and it does not contradict the benchmark, where
@@ -189,6 +216,10 @@ python scripts/run_case_studies.py --fetch      # downloads the three pairs, the
 python scripts/build_case_studies_page.py       # writes docs/case-studies.html
 python scripts/render_v2_tables.py
 ```
+
+For the improved model, add `--config configs/v2/pair_dense_t01.json --results docs/data/v2_results_final.json --tag
+final_ --report docs/data/v2_case_studies_final.json` to the first command and `--report
+docs/data/v2_case_studies_final.json` to the second.
 
 `run_case_studies.py` needs the Part A checkpoint (`outputs/v2/runs/baseline/seed42/best.pt`) and
 `docs/data/v2_results.json`. See [`V2_RESULTS.md`](V2_RESULTS.md) for how to produce them.

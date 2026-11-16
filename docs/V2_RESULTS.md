@@ -170,6 +170,127 @@ it must not look at test scenes.
 (crops, water level) is penalised for it. The test set is ten scenes. The network is small and was trained for a few
 minutes on a CPU on nine scenes. A larger or longer-trained model could behave differently.
 
+## 6. After the model-improvement loop
+
+The loop in [`V2_MODEL_IMPROVEMENT.md`](V2_MODEL_IMPROVEMENT.md) changed three things, each chosen on validation
+scenes only ([`V2_EXPERIMENTS.md`](V2_EXPERIMENTS.md) has every experiment):
+
+1. The coarsest feature scale was dropped from the score.
+2. A second loss was added to pretraining. It takes the same patch at the two dates of a train scene and teaches the
+   network to describe each position the same way on both dates. It uses no labels.
+3. The contrastive temperature was lowered from 0.2 to 0.1.
+
+The final configuration (`configs/v2/pair_dense_t01.json`) was frozen in a commit, and then scored on the test scenes
+once.
+
+**Short answer.** The improved network is clearly better than the v1 network on every measure. Against the colour
+difference the result is split. On the measure fixed in advance (F1 over all test pixels pooled) it still loses:
+0.185 against 0.270. Averaged per scene it wins: 0.273 against 0.241. It is better on most scenes and fails badly on
+three scenes with farmland, and its false marks there are enough to decide the pooled number.
+
+### Test results, all pixels pooled (the measure fixed in advance)
+
+<!-- v2:test_combined file=v2_results_final.json base=v2_results.json -->
+| Method | AUROC | PR-AUC | F1 | IoU | Precision | Recall |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| v1 network, as it was (Part A) | 0.628 ± 0.005 | 0.075 ± 0.002 | 0.127 ± 0.003 | 0.068 ± 0.002 | 0.079 ± 0.003 | 0.330 ± 0.062 |
+| Improved network (after the loop) | 0.785 ± 0.007 | 0.111 ± 0.004 | 0.185 ± 0.004 | 0.102 ± 0.002 | 0.125 ± 0.004 | 0.355 ± 0.002 |
+| Improved scoring, untrained network | 0.694 ± 0.003 | 0.085 ± 0.003 | 0.155 ± 0.004 | 0.084 ± 0.002 | 0.092 ± 0.003 | 0.503 ± 0.021 |
+| Colour difference, shared stretch | 0.738 | 0.214 | 0.270 | 0.156 | 0.261 | 0.278 |
+| Colour difference, raw values | 0.760 | 0.291 | 0.330 | 0.197 | 0.442 | 0.263 |
+<!-- /v2 -->
+
+### Test results, averaged per scene
+
+<!-- v2:test_scene_mean file=v2_results_final.json -->
+| Method | AUROC | PR-AUC | F1 | IoU | Precision | Recall |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Trained network | 0.760 ± 0.006 | 0.321 ± 0.007 | 0.273 ± 0.001 | 0.179 ± 0.001 | 0.400 ± 0.014 | 0.288 ± 0.004 |
+| Same network, untrained (random weights) | 0.717 ± 0.013 | 0.203 ± 0.022 | 0.203 ± 0.019 | 0.123 ± 0.014 | 0.155 ± 0.022 | 0.518 ± 0.015 |
+| Colour difference, shared stretch | 0.740 | 0.254 | 0.241 | 0.150 | 0.378 | 0.255 |
+| Colour difference, raw values | 0.735 | 0.254 | 0.220 | 0.137 | 0.398 | 0.204 |
+<!-- /v2 -->
+
+("Trained network" in this table and the ones below is the improved network.)
+
+![Precision-recall curves on the test scenes, improved network](img/v2/pr_curves_test_final.png)
+
+### Improved network against the references, scene by scene
+
+<!-- v2:paired file=v2_results_final.json split=test -->
+| Comparison | Pooled F1 difference | 95% interval (scenes resampled) | Per-scene F1 difference, mean ± spread | Scenes the trained network wins |
+| --- | ---: | ---: | ---: | ---: |
+| Trained (seed 42) minus colour difference (shared stretch) | -0.090 | -0.139 to +0.081 | +0.034 ± 0.077 | 6 of 10 |
+| Trained (seed 42) minus untrained network (same seed) | +0.022 | -0.014 to +0.149 | +0.046 ± 0.063 | 6 of 10 |
+| Trained (seed 43) minus colour difference (shared stretch) | -0.083 | -0.128 to +0.076 | +0.032 ± 0.075 | 5 of 10 |
+| Trained (seed 43) minus untrained network (same seed) | +0.028 | -0.010 to +0.168 | +0.076 ± 0.083 | 6 of 10 |
+| Trained (seed 44) minus colour difference (shared stretch) | -0.081 | -0.128 to +0.082 | +0.031 ± 0.073 | 5 of 10 |
+| Trained (seed 44) minus untrained network (same seed) | +0.038 | -0.012 to +0.215 | +0.088 ± 0.094 | 7 of 10 |
+<!-- /v2 -->
+
+<!-- v2:per_scene file=v2_results_final.json split=test seed=seed42 -->
+| Scene | Trained F1 | Trained AUROC | Untrained F1 | Untrained AUROC | Diff shared F1 | Diff shared AUROC | Diff raw F1 | Diff raw AUROC |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| brasilia | 0.222 | 0.929 | 0.277 | 0.883 | 0.208 | 0.708 | 0.186 | 0.709 |
+| chongqing | 0.444 | 0.899 | 0.321 | 0.818 | 0.215 | 0.756 | 0.080 | 0.774 |
+| dubai | 0.245 | 0.889 | 0.202 | 0.811 | 0.270 | 0.788 | 0.290 | 0.788 |
+| lasvegas | 0.641 | 0.946 | 0.528 | 0.899 | 0.598 | 0.863 | 0.621 | 0.873 |
+| milano | 0.333 | 0.976 | 0.185 | 0.953 | 0.268 | 0.870 | 0.180 | 0.865 |
+| montpellier | 0.592 | 0.938 | 0.518 | 0.935 | 0.497 | 0.843 | 0.473 | 0.830 |
+| norcia | 0.012 | 0.456 | 0.022 | 0.536 | 0.061 | 0.661 | 0.060 | 0.641 |
+| rio | 0.243 | 0.846 | 0.206 | 0.783 | 0.241 | 0.782 | 0.244 | 0.766 |
+| saclay_w | 0.011 | 0.271 | 0.018 | 0.304 | 0.031 | 0.543 | 0.032 | 0.501 |
+| valencia | 0.005 | 0.378 | 0.007 | 0.428 | 0.021 | 0.582 | 0.030 | 0.604 |
+<!-- /v2 -->
+
+### What the numbers say
+
+- **Against v1.** Pooled F1 rose from 0.127 to 0.185, PR-AUC from 0.075 to 0.111 and AUROC from 0.628 to 0.785. The
+  gain is the same for all three seeds (standard deviation 0.004).
+- **Against random weights.** Pretraining now helps. With the same scoring, the untrained network scores 0.155 pooled
+  F1 and 0.203 per scene, against 0.185 and 0.273. The pooled interval still touches zero (for example -0.014 to
+  +0.149 for seed 42), so this is a likely benefit, not a certain one.
+- **Against the colour difference, pooled.** The network loses by 0.08 to 0.09 F1. The scene-resampled interval is
+  wide and includes zero (about -0.14 to +0.08), so ten scenes cannot settle it, but the point estimate is against the
+  network. PR-AUC says the same more strongly: 0.111 against 0.214.
+- **Against the colour difference, per scene.** The network wins on 5 or 6 of 10 scenes, and its per-scene mean F1 and
+  PR-AUC are higher (0.273 against 0.241, and 0.321 against 0.254).
+- **Why the two views disagree.** On seven scenes the network ranks pixels very well (AUROC 0.85 to 0.98). On
+  `norcia`, `saclay_w` and `valencia` it is worse than guessing (AUROC 0.27 to 0.49), and it marks large parts of
+  those scenes. Pooled metrics count pixels, so those false marks pull precision down for the whole test set
+  (0.125).
+
+![saclay_w, test scene, improved network](img/v2/final_test_saclay_w.jpg)
+
+*`saclay_w`: mid-March against late August. The fields changed with the crop cycle. OSCD labels only urban change, so
+none of that counts, and the network marks most of the farmland. The colour difference marks fields too, but fewer.
+`norcia` and `valencia` fail the same way: a town surrounded by fields, photographed in summer and in autumn.*
+
+![chongqing, test scene, improved network](img/v2/final_test_chongqing.jpg)
+
+*`chongqing`: the kind of scene where the network is better. Its F1 is twice the colour difference's (0.44 against
+0.22). It finds much more of the real construction, at the cost of some false marks.*
+
+- **Why validation did not warn about this.** The five validation scenes are all cities. None is farmland. The loop
+  therefore selected for urban scenes, and the validation gain over the colour difference (0.292 against 0.224) did
+  not carry over to a test set that contains farmland. This is a weakness of the split, which was drawn at random from
+  only 14 scenes.
+- **A stronger simple baseline.** Removing marked groups smaller than 8 pixels helps the colour difference on
+  validation (Experiment 5). On the test scenes it gives 0.275 (shared stretch) and 0.331 (raw values) pooled F1,
+  recorded in [`data/v2_results_final_post8.json`](data/v2_results_final_post8.json). The network does not gain from
+  the filter (0.184).
+
+### Verdict
+
+Does the improved model beat the colour-difference baseline on the test scenes? **Not on the measure that was fixed
+in advance.** It beats it on per-scene averages and on most individual scenes, and it is a clear step up from v1.
+The honest summary is "better than a colour difference on urban scenes, much worse on farmland, and not better
+overall".
+
+Test passes: three in total, all listed in [`data/v2_test_ledger.json`](data/v2_test_ledger.json): the v1 baseline
+(Part A), the final configuration, and the final configuration with the 8-pixel filter (run to get the filtered
+colour-difference references).
+
 ## Reproduce
 
 ```bash
@@ -186,3 +307,8 @@ python scripts/render_v2_tables.py
 ```
 
 Training takes about 8 minutes per seed on a 2-core CPU. Checkpoints go to `outputs/v2/runs/`, which is not in git.
+
+The improved network (section 6) is reproduced the same way with `configs/v2/pair_dense_t01.json` (about 15 minutes
+per seed) and `--output docs/data/v2_results_final.json` on the test pass. `bash scripts/run_queue_v2.sh
+pair_dense_t01:42 pair_dense_t01:43 pair_dense_t01:44` trains the three seeds and can be re-run after an interruption:
+a resumed run gives the same weights as an uninterrupted one.

@@ -40,6 +40,13 @@ known while the loop ran. No test score was computed for any candidate below, an
 | 0 | v1 as it was: per-scene Otsu threshold | start | 42, 43, 44 | 0.083 ± 0.002 | – | 0.115 ± 0.008 | start |
 | 1 | Threshold fitted on validation scenes instead of Otsu | threshold | 42, 43, 44 | 0.145 ± 0.014 | +0.063 | 0.115 ± 0.008 | kept |
 | 2 | Drop the coarsest feature scale from the score | model (scoring) | 42, 43, 44 | 0.202 ± 0.004 | +0.057 | 0.137 ± 0.008 | kept |
+| 3 | Add a dense temporal loss on before/after pairs of the train scenes | model (training) | 42, 43, 44 | 0.275 ± 0.001 | +0.073 | 0.201 ± 0.009 | kept |
+| 4a | Put the coarse scale back (weights of experiment 3) | model (scoring) | 42, 43, 44 | 0.265 ± 0.006 | -0.010 | 0.192 ± 0.003 | discarded |
+| 6 | Contrastive temperature 0.1 instead of 0.2 | model (training) | 42, 43, 44 | 0.292 ± 0.003 | +0.017 | 0.240 ± 0.009 | kept, final |
+| 4b | Put the coarse scale back (weights of experiment 6) | model (scoring) | 42, 43, 44 | 0.287 ± 0.012 | -0.005 | 0.237 ± 0.007 | discarded |
+| 5 | Remove marked groups smaller than 8 pixels | post-processing | 42, 43, 44 | 0.294 ± 0.003 | +0.001 | 0.240 ± 0.009 | discarded |
+| ref-d | Reference: colour difference, shared stretch, with the same 8-pixel filter | reference | none | 0.264 | +0.040 | 0.141 | reference |
+| ref-e | Reference: colour difference, raw values, with the same 8-pixel filter | reference | none | 0.320 | +0.052 | 0.181 | strongest reference |
 <!-- /v2 -->
 
 ## Entries
@@ -99,6 +106,17 @@ known while the loop ran. No test score was computed for any candidate below, an
   committed, once the panels had been rendered and looked at. The run had not finished and no result was known.
 - **Config.** `configs/v2/pair_dense.json`: baseline plus `pair_weight 1.0`, `pair_points 16`. One change: the added
   loss term. The single-image loss is kept as it was.
+- **Scoring.** `configs/v2/pair_dense_fine_mid.json`: the same checkpoints scored with the current best rule (fine
+  and middle scales), so that the loss term is the only difference from Experiment 2.
+- **Result.** Primary metric 0.275 ± 0.001 (seeds: 0.275, 0.276, 0.274) against 0.202 ± 0.004. PR-AUC rose from
+  0.137 to 0.201 and AUROC from 0.725 to 0.790.
+- **Decision: kept.** The gain of 0.073 is far above the noise level. This is a model gain: the weights changed and
+  the ranking metrics, which use no threshold, moved with the F1.
+- **Learned.** The network now passes the shared-stretch colour difference on the primary metric (0.224) and is level
+  with the raw one (0.268). The pooled number leans on one scene: `beirut` holds about half of all validation pixels
+  and has by far the highest F1 (0.45). `bercy` (winter against summer) is still a failure, with F1 0.01. Averaged per
+  scene instead of per pixel, the network scores 0.143, still below the colour difference's 0.153. New noise level:
+  0.001.
 
 ### Experiment 4: with the pair-trained weights, put the coarse scale back
 
@@ -108,6 +126,11 @@ known while the loop ran. No test score was computed for any candidate below, an
   written. It is logged as a control, to check that Experiment 2's decision still holds for the new weights.
 - **Hypothesis.** The coarse stage is now trained with the dense loss too, so it may no longer hurt. If the
   three-scale average beats the two-scale one by more than twice the noise level, Experiment 2 is reversed.
+- **Result.** With Experiment 3's weights: 0.265 ± 0.006 for three scales against 0.275 ± 0.001 for two. Checked
+  again later with Experiment 6's weights (`configs/v2/pair_dense_t01_three_scales.json`): 0.287 ± 0.012 against
+  0.292 ± 0.003.
+- **Decision: discarded, both times.** Three scales are never better, and they are noisier between seeds.
+  Experiment 2's decision stands.
 
 ### Experiment 5: remove small marked groups from the mask
 
@@ -117,6 +140,15 @@ known while the loop ran. No test score was computed for any candidate below, an
   8 pixels (4-connected) should raise precision at little cost in recall. The network's masks are already smooth,
   because features are compared at half and quarter resolution, so I expect a small effect for the network and a
   larger one for the colour difference. I would discard it if the gain is not above twice the noise level.
+- **Config.** `configs/v2/pair_dense_t01_post8.json`: the best configuration at the time (Experiment 6) with the
+  filter applied to every method's mask. It was run after Experiment 6.
+- **Result.** Network: 0.294 ± 0.003 against 0.292 ± 0.003, a gain of 0.001. Colour difference, shared stretch: 0.224
+  to 0.264. Colour difference, raw values: 0.268 to 0.320.
+- **Decision: discarded for the network.** The gain is below the noise level, as predicted.
+- **Learned, and it matters.** The same filter lifts the raw colour difference to 0.320, which is **above the best
+  network (0.292)**. So on validation the network beats the colour difference as the plan defines it (shared stretch,
+  no filter), but not the strongest simple method found here. Both filtered references are in the summary table and
+  were also scored on the test scenes.
 
 ### Experiment 6: contrastive temperature 0.1 instead of 0.2
 
@@ -128,3 +160,32 @@ known while the loop ran. No test score was computed for any candidate below, an
   metric does not beat Experiment 3's three-seed mean by more than twice its noise level.
 - **Config.** `configs/v2/pair_dense_t01.json`: Experiment 3's config with `temperature 0.1`. The one temperature
   value is used by both loss terms.
+- **Result.** Primary metric 0.292 ± 0.003 (seeds: 0.291, 0.297, 0.288) against 0.275 ± 0.001. PR-AUC 0.240 against
+  0.201, AUROC 0.839 against 0.790. Per-scene mean F1 rose from 0.143 to 0.176.
+- **Decision: kept.** The gain of 0.017 is small but well above twice the noise level, every seed is above every
+  seed of Experiment 3, and the threshold-free metrics rose more than the F1 did. This is the final configuration.
+- **Learned.** The largest per-scene change was `abudhabi` (F1 0.10 to 0.21). `bercy` stayed near zero (0.02).
+
+## Why the loop stopped
+
+It did not stop on one of the stopping rules in `V2_MODEL_IMPROVEMENT.md`. It stopped because the session ran out of
+time: each training run takes 15 minutes on this 2-core machine, a kept change needs three, and the environment
+restarted twice and killed running jobs. Six experiments were completed.
+
+The closest rule is the third one (the best model beats the colour-difference baseline on validation by more than
+the noise level). That part holds: 0.292 against 0.224. But the remaining ideas do not all need a large budget, so the
+rule is not met.
+
+Not tried:
+
+- **Section C.** A per-band stretch fixed on the training scenes.
+- **Section D.** Haze, brightness-shift and misregistration augmentations; a larger batch.
+- **Section E, variants.** The weight of the pair loss; training on pairs only, without the single-image loss.
+- **Section F.** Encoder width, a learned head on the feature difference, a larger backbone.
+- **Section G.** Hole filling and morphological opening. Only the small-group filter was tested.
+
+## Final configuration
+
+`configs/v2/pair_dense_t01.json`, frozen in commit `525e807` before any improved model was scored on the test scenes.
+Test results and what they mean are in [`V2_RESULTS.md`](V2_RESULTS.md) (section 6) and
+[`V2_IMPROVEMENT_SUMMARY.md`](V2_IMPROVEMENT_SUMMARY.md).

@@ -1,0 +1,70 @@
+{
+  "config": "pair_dense_t01",
+  "seed": 42,
+  "thresholds": {
+    "trained": 0.5659489631652832,
+    "diff_shared": 0.8069392442703247
+  },
+  "scenes": [
+    {
+      "scene": "brasilia",
+      "changed_fraction": 0.02581286901027689,
+      "f1_trained": 0.2219676356866676,
+      "f1_diff_shared": 0.20764911537239114
+    },
+    {
+      "scene": "chongqing",
+      "changed_fraction": 0.0721117042707494,
+      "f1_trained": 0.44419985062305906,
+      "f1_diff_shared": 0.21510415178443867
+    },
+    {
+      "scene": "dubai",
+      "changed_fraction": 0.09922032295665925,
+      "f1_trained": 0.24533031177036121,
+      "f1_diff_shared": 0.2696350874964271
+    },
+    {
+      "scene": "lasvegas",
+      "changed_fraction": 0.07673089439713619,
+      "f1_trained": 0.6410415068188006,
+      "f1_diff_shared": 0.5977518303802292
+    },
+    {
+      "scene": "milano",
+      "changed_fraction": 0.007954358620236099,
+      "f1_trained": 0.3330954080418749,
+      "f1_diff_shared": 0.2676854818831649
+    },
+    {
+      "scene": "montpellier",
+      "changed_fraction": 0.06794499443073816,
+      "f1_trained": 0.5921855921855922,
+      "f1_diff_shared": 0.4967026928008793
+    },
+    {
+      "scene": "norcia",
+      "changed_fraction": 0.013224120278062187,
+      "f1_trained": 0.012174422007609013,
+      "f1_diff_shared": 0.06122271501869728
+    },
+    {
+      "scene": "rio",
+      "changed_fraction": 0.05687002088071393,
+      "f1_trained": 0.24252687380356355,
+      "f1_diff_shared": 0.2405098365198116
+    },
+    {
+      "scene": "saclay_w",
+      "changed_fraction": 0.011414091785857262,
+      "f1_trained": 0.011448925855747225,
+      "f1_diff_shared": 0.031460140819071225
+    },
+    {
+      "scene": "valencia",
+      "changed_fraction": 0.004444791016843418,
+      "f1_trained": 0.0046811637590833625,
+      "f1_diff_shared": 0.02088750586128991
+    }
+  ]
+}

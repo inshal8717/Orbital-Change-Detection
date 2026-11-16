@@ -40,7 +40,7 @@ ul { padding-left: 20px; margin: 6px 0; }
 <p>Each picture below is two real Sentinel-2 photos of the same place. Drag the slider to move between them. The
 coloured marks are what each method flagged as changed. There is no answer key for these sites, so the marks are
 shown for inspection and are not scored.</p>
-<p class="note">Model: <code>baseline</code>, seed 42. Both thresholds were fitted
+<p class="note">Model: <code>pair_dense_t01</code>, seed 42. Both thresholds were fitted
 on labelled validation scenes of the OSCD benchmark and applied here unchanged. Full write-up:
 <a href="CASE_STUDIES.md">CASE_STUDIES.md</a>. Benchmark results: <a href="V2_RESULTS.md">V2_RESULTS.md</a>.
 <a href="index.html">Back to the project page</a>.</p>
@@ -49,10 +49,10 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
 <p>Open desert became the Expo 2020 exhibition site. Site development began in March 2016 and the Expo ran from 1 October 2021 to 31 March 2022, so the first window is before any work and the second is while the Expo was open.</p>
 <figure>
   <div class="compare">
-    <img src="img/v2/case_expo2020_after.jpg" alt="Expo 2020 site, Dubai South, after (2022-03-14)" width="508" height="508">
-    <img class="layer model" src="img/v2/case_expo2020_model.png" alt="">
-    <img class="layer diff" src="img/v2/case_expo2020_diff.png" alt="">
-    <img class="layer before" src="img/v2/case_expo2020_before.jpg" alt="Expo 2020 site, Dubai South, before (2016-01-20)">
+    <img src="img/v2/case_final_expo2020_after.jpg" alt="Expo 2020 site, Dubai South, after (2022-03-14)" width="508" height="508">
+    <img class="layer model" src="img/v2/case_final_expo2020_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_final_expo2020_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_final_expo2020_before.jpg" alt="Expo 2020 site, Dubai South, before (2016-01-20)">
     <div class="line"></div>
     <span class="tag left">Before 2016</span>
     <span class="tag right">After 2022</span>
@@ -60,7 +60,7 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
   <div class="controls">
     <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
     <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
-      Trained network (33% of the scene)</label>
+      Trained network (37% of the scene)</label>
     <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
       Colour difference (21% of the scene)</label>
   </div>
@@ -75,10 +75,10 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
 <p>A 2 GW solar plant covering more than 20 square kilometres was built on open desert. Construction began in 2020, panel installation finished in April 2023 and the plant was inaugurated on 16 November 2023.</p>
 <figure>
   <div class="compare">
-    <img src="img/v2/case_aldhafra_solar_after.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, after (2024-01-08)" width="816" height="816">
-    <img class="layer model" src="img/v2/case_aldhafra_solar_model.png" alt="">
-    <img class="layer diff" src="img/v2/case_aldhafra_solar_diff.png" alt="">
-    <img class="layer before" src="img/v2/case_aldhafra_solar_before.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, before (2020-01-04)">
+    <img src="img/v2/case_final_aldhafra_solar_after.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, after (2024-01-08)" width="816" height="816">
+    <img class="layer model" src="img/v2/case_final_aldhafra_solar_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_final_aldhafra_solar_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_final_aldhafra_solar_before.jpg" alt="Al Dhafra Solar PV, Abu Dhabi, before (2020-01-04)">
     <div class="line"></div>
     <span class="tag left">Before 2020</span>
     <span class="tag right">After 2024</span>
@@ -86,7 +86,7 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
   <div class="controls">
     <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
     <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
-      Trained network (34% of the scene)</label>
+      Trained network (30% of the scene)</label>
     <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
       Colour difference (28% of the scene)</label>
   </div>
@@ -101,10 +101,10 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
 <p>New solar arrays were added to an existing solar park. Between the two windows DEWA commissioned the later stages of phase 3 (2019 to 2020), phase 5 (900 MW, August 2021 to June 2023) and phase 4 (950 MW, 2023). The scene also keeps part of the older arrays, which did not change.</p>
 <figure>
   <div class="compare">
-    <img src="img/v2/case_mbr_solar_after.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, after (2024-03-18)" width="810" height="812">
-    <img class="layer model" src="img/v2/case_mbr_solar_model.png" alt="">
-    <img class="layer diff" src="img/v2/case_mbr_solar_diff.png" alt="">
-    <img class="layer before" src="img/v2/case_mbr_solar_before.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, before (2019-03-05)">
+    <img src="img/v2/case_final_mbr_solar_after.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, after (2024-03-18)" width="810" height="812">
+    <img class="layer model" src="img/v2/case_final_mbr_solar_model.png" alt="">
+    <img class="layer diff" src="img/v2/case_final_mbr_solar_diff.png" alt="">
+    <img class="layer before" src="img/v2/case_final_mbr_solar_before.jpg" alt="Mohammed bin Rashid Al Maktoum Solar Park, Dubai, before (2019-03-05)">
     <div class="line"></div>
     <span class="tag left">Before 2019</span>
     <span class="tag right">After 2024</span>
@@ -112,7 +112,7 @@ on labelled validation scenes of the OSCD benchmark and applied here unchanged. 
   <div class="controls">
     <input type="range" min="0" max="100" value="50" aria-label="Slide between the before and after image">
     <label><input type="checkbox" data-layer="model" checked><span class="swatch" style="background:var(--model)"></span>
-      Trained network (20% of the scene)</label>
+      Trained network (19% of the scene)</label>
     <label><input type="checkbox" data-layer="diff"><span class="swatch" style="background:var(--diff)"></span>
       Colour difference (18% of the scene)</label>
   </div>

@@ -1,11 +1,132 @@
 {
   "note": "Order and decisions of the v2 experiments. Numbers are read from the result files by scripts/summarize_experiments.py.",
   "experiments": [
-    {"id": "ref-a", "config": "baseline", "method": "diff_shared", "change": "Reference: colour difference, shared stretch (no network)", "kind": "reference", "decision": "to beat"},
-    {"id": "ref-b", "config": "baseline", "method": "diff_raw", "change": "Reference: colour difference, raw values (no network)", "kind": "reference", "decision": "reference"},
-    {"id": "ref-c", "config": "baseline", "method": "untrained", "change": "Reference: v1 network with random weights", "kind": "reference", "decision": "reference"},
-    {"id": "0", "config": "baseline", "rule": "otsu", "change": "v1 as it was: per-scene Otsu threshold", "kind": "start", "decision": "start"},
-    {"id": "1", "config": "baseline", "change": "Threshold fitted on validation scenes instead of Otsu", "kind": "threshold", "compare_to": {"config": "baseline", "rule": "otsu"}, "decision": "kept"},
-    {"id": "2", "config": "scale_fine_mid", "change": "Drop the coarsest feature scale from the score", "kind": "model (scoring)", "compare_to": {"config": "baseline"}, "decision": "kept"}
+    {
+      "id": "ref-a",
+      "config": "baseline",
+      "method": "diff_shared",
+      "change": "Reference: colour difference, shared stretch (no network)",
+      "kind": "reference",
+      "decision": "to beat"
+    },
+    {
+      "id": "ref-b",
+      "config": "baseline",
+      "method": "diff_raw",
+      "change": "Reference: colour difference, raw values (no network)",
+      "kind": "reference",
+      "decision": "reference"
+    },
+    {
+      "id": "ref-c",
+      "config": "baseline",
+      "method": "untrained",
+      "change": "Reference: v1 network with random weights",
+      "kind": "reference",
+      "decision": "reference"
+    },
+    {
+      "id": "0",
+      "config": "baseline",
+      "rule": "otsu",
+      "change": "v1 as it was: per-scene Otsu threshold",
+      "kind": "start",
+      "decision": "start"
+    },
+    {
+      "id": "1",
+      "config": "baseline",
+      "change": "Threshold fitted on validation scenes instead of Otsu",
+      "kind": "threshold",
+      "compare_to": {
+        "config": "baseline",
+        "rule": "otsu"
+      },
+      "decision": "kept"
+    },
+    {
+      "id": "2",
+      "config": "scale_fine_mid",
+      "change": "Drop the coarsest feature scale from the score",
+      "kind": "model (scoring)",
+      "compare_to": {
+        "config": "baseline"
+      },
+      "decision": "kept"
+    },
+    {
+      "id": "3",
+      "config": "pair_dense_fine_mid",
+      "change": "Add a dense temporal loss on before/after pairs of the train scenes",
+      "kind": "model (training)",
+      "compare_to": {
+        "config": "scale_fine_mid"
+      },
+      "decision": "kept"
+    },
+    {
+      "id": "4a",
+      "config": "pair_dense",
+      "change": "Put the coarse scale back (weights of experiment 3)",
+      "kind": "model (scoring)",
+      "compare_to": {
+        "config": "pair_dense_fine_mid"
+      },
+      "decision": "discarded"
+    },
+    {
+      "id": "6",
+      "config": "pair_dense_t01",
+      "change": "Contrastive temperature 0.1 instead of 0.2",
+      "kind": "model (training)",
+      "compare_to": {
+        "config": "pair_dense_fine_mid"
+      },
+      "decision": "kept, final"
+    },
+    {
+      "id": "4b",
+      "config": "pair_dense_t01_three_scales",
+      "change": "Put the coarse scale back (weights of experiment 6)",
+      "kind": "model (scoring)",
+      "compare_to": {
+        "config": "pair_dense_t01"
+      },
+      "decision": "discarded"
+    },
+    {
+      "id": "5",
+      "config": "pair_dense_t01_post8",
+      "change": "Remove marked groups smaller than 8 pixels",
+      "kind": "post-processing",
+      "compare_to": {
+        "config": "pair_dense_t01"
+      },
+      "decision": "discarded"
+    },
+    {
+      "id": "ref-d",
+      "config": "pair_dense_t01_post8",
+      "method": "diff_shared",
+      "change": "Reference: colour difference, shared stretch, with the same 8-pixel filter",
+      "kind": "reference",
+      "compare_to": {
+        "config": "baseline",
+        "method": "diff_shared"
+      },
+      "decision": "reference"
+    },
+    {
+      "id": "ref-e",
+      "config": "pair_dense_t01_post8",
+      "method": "diff_raw",
+      "change": "Reference: colour difference, raw values, with the same 8-pixel filter",
+      "kind": "reference",
+      "compare_to": {
+        "config": "baseline",
+        "method": "diff_raw"
+      },
+      "decision": "strongest reference"
+    }
   ]
 }

@@ -1,0 +1,40 @@
+{
+  "config": "pair_dense_t01",
+  "seed": 42,
+  "thresholds": {
+    "trained": 0.5659489631652832,
+    "diff_shared": 0.8069392442703247
+  },
+  "scenes": [
+    {
+      "scene": "abudhabi",
+      "changed_fraction": 0.03761389635133088,
+      "f1_trained": 0.218903098555704,
+      "f1_diff_shared": 0.16612763272067524
+    },
+    {
+      "scene": "aguasclaras",
+      "changed_fraction": 0.016402790415529268,
+      "f1_trained": 0.10116250309176354,
+      "f1_diff_shared": 0.1028047127515379
+    },
+    {
+      "scene": "beirut",
+      "changed_fraction": 0.026863614763187074,
+      "f1_trained": 0.48669602197884915,
+      "f1_diff_shared": 0.36363636363636365
+    },
+    {
+      "scene": "bercy",
+      "changed_fraction": 0.007355836849507736,
+      "f1_trained": 0.011676701331873745,
+      "f1_diff_shared": 0.05024406117800195
+    },
+    {
+      "scene": "paris",
+      "changed_fraction": 0.0028783308195072903,
+      "f1_trained": 0.046797309154723604,
+      "f1_diff_shared": 0.10003718854592786
+    }
+  ]
+}
