@@ -193,6 +193,27 @@ rare.
   mismatch between the two did not hurt on the synthetic scenes, but training on shared-stretch pairs is untested.
 - **AdamW with cosine decay:** a stable default for contrastive training. It is not tuned for any particular biome.
 
+## v2 roadmap
+
+The v2 work order is in [`docs/V2_PLAN.md`](docs/V2_PLAN.md). It has two parts:
+
+- **Real-data test.** Run the method on a public, labelled Sentinel-2 change benchmark, with a validation-chosen threshold
+  and a single scored test pass.
+- **Local case studies.** Run the method on UAE sites with documented change, and compare it with the colour-difference
+  baseline visually.
+
+Further ideas, not yet in the plan:
+
+- **Harder synthetic test.** Add seasonal lighting shifts, clouds, small misregistration between the two dates and
+  sensor noise. On the current synthetic scenes a colour difference scores perfectly, so the test cannot separate the
+  methods.
+- **Better decision threshold.** Otsu over-marks changed pixels (precision 0.588 on the synthetic test). A threshold
+  chosen on validation data, or a learned one, should turn the network's good ranking (AUROC 0.999) into a good mask.
+- **Demo.** `app.py` already exists. Let a user upload two images and see the changed pixels, with a slider between
+  before and after.
+- **Honest negative result.** Self-supervised pretraining did not beat random weights or a colour difference on
+  synthetic data. Keep that finding in the write-up and state what would change it.
+
 ## Limitations
 
 This is a research baseline, not an operational product.
